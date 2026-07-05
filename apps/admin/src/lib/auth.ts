@@ -24,3 +24,19 @@ export async function getCurrentAdmin() {
 
   return null;
 }
+
+export function verifyAuth(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const { verify } = require("jsonwebtoken");
+    const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-for-dev";
+    return verify(token, JWT_SECRET);
+  } catch (error) {
+    return null;
+  }
+}

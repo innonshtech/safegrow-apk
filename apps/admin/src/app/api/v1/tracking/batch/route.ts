@@ -35,6 +35,7 @@ export async function POST(request: Request) {
 
     await prisma.locationPing.createMany({
       data: pings.map((ping) => ({
+        userId: auth.id,
         attendanceId: ping.attendanceId,
         time: new Date(ping.time),
         lat: ping.lat,

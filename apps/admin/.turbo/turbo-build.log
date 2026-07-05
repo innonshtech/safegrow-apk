@@ -1,0 +1,27 @@
+
+> admin@0.1.0 build G:\safegrow-app\apps\admin
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.6s
+  Running TypeScript ...
+Failed to type check.
+
+./src/app/api/v1/tracking/batch/route.ts:37:7
+Type error: Type '{ attendanceId: string; time: Date; lat: number; lng: number; accuracy: number | null; speed: number | null; }[]' is not assignable to type 'LocationPingCreateManyInput | LocationPingCreateManyInput[]'.
+  Type '{ attendanceId: string; time: Date; lat: number; lng: number; accuracy: number | null; speed: number | null; }[]' is not assignable to type 'LocationPingCreateManyInput[]'.
+    Property 'userId' is missing in type '{ attendanceId: string; time: Date; lat: number; lng: number; accuracy: number | null; speed: number | null; }' but required in type 'LocationPingCreateManyInput'.
+
+  [90m35 |[0m
+  [90m36 |[0m     [36mawait[0m prisma.locationPing.createMany({
+[31m[1m>[0m [90m37 |[0m       data: pings.map((ping) => ({
+  [90m   |[0m       [31m[1m^[0m
+  [90m38 |[0m         attendanceId: ping.attendanceId,
+  [90m39 |[0m         time: [36mnew[0m [33mDate[0m(ping.time),
+  [90m40 |[0m         lat: ping.lat,
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.
