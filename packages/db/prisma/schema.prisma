@@ -1,0 +1,151 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  REP
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum VisitOutcome {
+  MET
+  ORDER_PLACED
+  NOT_AVAILABLE
+}
+
+model User {
+  id           String     @id @default(uuid())
+  userId       String     @unique // Custom ID for login
+  email        String?    @unique // For OTP and credentials delivery
+  passwordHash String
+  plainPassword String?
+  resetOtp      String?
+  resetOtpExpiry DateTime?
+  name         String
+  phone        String?
+  role         Role
+  status       UserStatus @default(ACTIVE)
+
+  territory    String?
+  employeeId   String?    @unique
+  joiningDate  DateTime?
+
+  // Push Notifications
+  fcmToken              String?
+  pushEnabled           Boolean @default(true)
+  notifyCheckIn         Boolean @default(true)
+  notifyTrackingStopped Boolean @default(true)
+  notifySyncIssues      Boolean @default(true)
+  notifyManagerMessages Boolean @default(true)
+
+  reportsToId  String?
+  manager      User?   @relation("ManagerToSubordinates", fields: [reportsToId], references: [id])
+  subordinates User[]  @relation("ManagerToSubordinates")
+
+  attendances    Attendance[]
+  visits         Visit[]
+  locationPings  LocationPing[]
+  alerts         FraudAlert[]   @relation("FraudAlertsTriggered")
+  resolvedAlerts FraudAlert[]   @relation("FraudAlertsResolved")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attendance {
+  id     String   @id @default(uuid())
+  date   DateTime @db.Date
+  userId String
+  user   User     @relation(fields: [userId], references: [id])
+
+  checkInTime     DateTime
+  checkInLat      Float
+  checkInLng      Float
+  checkInPhotoUrl String
+
+  checkOutTime     DateTime?
+  checkOutLat      Float?
+  checkOutLng      Float?
+  checkOutPhotoUrl String?
+
+  visits        Visit[]
+  locationPings LocationPing[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Visit {
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  attendanceId String
+  attendance   Attendance @relation(fields: [attendanceId], references: [id])
+
+  time     DateTime
+  lat      Float
+  lng      Float
+  photoUrl String
+
+  vendorName String @default("")
+  area       String @default("")
+  outcome   VisitOutcome
+  notes     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LocationPing {
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  attendanceId String
+  attendance   Attendance @relation(fields: [attendanceId], references: [id])
+
+  time     DateTime
+  lat      Float
+  lng      Float
+  accuracy Float?
+  speed    Float?
+
+  createdAt DateTime @default(now())
+}
+
+model FraudAlert {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation("FraudAlertsTriggered", fields: [userId], references: [id])
+
+  type     String // e.g. "MOCK_LOCATION"
+  metadata Json? // Stores detection payloads
+
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   User?     @relation("FraudAlertsResolved", fields: [resolvedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  id          String  @id @default(uuid())
+  key         String  @unique
+  value       String
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

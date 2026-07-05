@@ -1,0 +1,22 @@
+{
+  "name": "safegrow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SafeGrow Field Sales Tracking Platform",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "turbo": "^1.13.0",
+    "typescript": "^5.4.3"
+  },
+  "packageManager": "pnpm@8.15.6"
+}
