@@ -1,0 +1,148 @@
+.container {
+  padding: 1.5rem 2rem;
+  max-width: 1000px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  background-color: #f1f3f4;
+  border-radius: 20px;
+  padding: 0.2rem;
+}
+
+.filterBtn {
+  background: transparent;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterActive {
+  background-color: white;
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.alertsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.alertItem {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.alertItem:last-child {
+  border-bottom: none;
+}
+
+.alertIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconRed {
+  background-color: #fce8e8;
+  color: #d93025;
+}
+
+.iconOrange {
+  background-color: #feefe3;
+  color: #e37400;
+}
+
+.iconYellow {
+  background-color: #fef7e0;
+  color: #f29900;
+}
+
+.alertInfo {
+  flex: 1;
+}
+
+.alertTitleRow {
+  margin-bottom: 0.2rem;
+}
+
+.alertType {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.alertSubtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.alertMeta {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.alertActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dismissBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dismissBtn:hover {
+  color: var(--text);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}

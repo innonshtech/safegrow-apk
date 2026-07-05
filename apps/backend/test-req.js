@@ -1,0 +1,1 @@
+fetch('http://localhost:3001/api/v1/upload/presigned-url', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contentType: 'image/jpeg', fileExtension: 'jpg' }) }).then(res => res.text()).then(console.log).catch(console.error);

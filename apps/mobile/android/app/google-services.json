@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "534218873947",
+    "project_id": "safegrow-1d9f2",
+    "storage_bucket": "safegrow-1d9f2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534218873947:android:e5ba7c6690cafeaf58b37e",
+        "android_client_info": {
+          "package_name": "com.safegrowmobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDm1BZhqJ-jFSX_noG8h2pgHlR5ff0U9bI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
