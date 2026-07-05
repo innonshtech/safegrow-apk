@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const token = jwt.sign(
       { id: user.id, role: user.role, userId: user.userId },
       process.env.JWT_SECRET || 'fallback-secret-for-dev',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
+      { expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any }
     );
 
     return NextResponse.json({

@@ -136,6 +136,27 @@
   border-top: 1px solid var(--border);
 }
 
+.cancelBtn {
+  width: 90px;
+  height: 42px;
+  border-radius: 9px;
+  border-width: 1px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submitBtn {
+  width: 160px;
+  height: 42px;
+  border-radius: 9px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Success Card */
 .successCard {
   background-color: var(--surface);
@@ -231,6 +252,10 @@
   color: var(--primary);
   font-size: 0.75rem;
   font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .recreateBtn:hover {
@@ -238,13 +263,30 @@
 }
 
 .successFooter {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.addAnotherBtn {
+  width: 182px;
+  height: 44px;
+  border-radius: 10px;
+  border-width: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .doneBtn {
+  width: 182px;
+  height: 44px;
+  border-radius: 10px;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .doneBtn a {

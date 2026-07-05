@@ -1,0 +1,74 @@
+
+> backend@0.1.0 build G:\safegrow-app\apps\backend
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Turbopack build encountered 1 warnings:
+[externals]/@prisma/client
+unexpected export *
+export * used with module [externals]/@prisma/client [external] (@prisma/client, cjs, [project]/packages/db/node_modules/@prisma/client) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import trace:
+  external:
+    [externals]/@prisma/client [external]
+    ./apps/backend/src/lib/apiHandler.ts [App Route]
+    ./apps/backend/src/app/api/v1/visits/route.ts [App Route]
+
+
+✓ Compiled successfully in 2.9s
+  Running TypeScript ...
+  Finished TypeScript in 4.2s ...
+  Collecting page data using 11 workers ...
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+  Generating static pages using 11 workers (0/20) ...
+  Generating static pages using 11 workers (5/20) 
+  Generating static pages using 11 workers (10/20) 
+  Generating static pages using 11 workers (15/20) 
+✓ Generating static pages using 11 workers (20/20) in 536ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/auth/login
+├ ƒ /api/v1/admin/employees
+├ ƒ /api/v1/attendance/check-in
+├ ƒ /api/v1/attendance/check-out
+├ ƒ /api/v1/attendance/history
+├ ƒ /api/v1/auth/change-password
+├ ƒ /api/v1/auth/forgot-password
+├ ƒ /api/v1/auth/login
+├ ƒ /api/v1/auth/me
+├ ƒ /api/v1/auth/refresh
+├ ƒ /api/v1/auth/reset-password
+├ ƒ /api/v1/auth/verify-otp
+├ ƒ /api/v1/manager/team/[id]/day
+├ ƒ /api/v1/manager/team/status
+├ ƒ /api/v1/tracking/batch
+├ ƒ /api/v1/upload/presigned-url
+├ ƒ /api/v1/users/me/fcm
+├ ƒ /api/v1/users/me/preferences
+├ ƒ /api/v1/visits
+└ ƒ /api/v1/visits/history
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

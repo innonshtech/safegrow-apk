@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--background);
+  background-color: #f4f8f4;
   padding: 1rem;
 }
 
@@ -29,7 +29,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
+  margin-top: -1rem;
 }
 
 .title {
@@ -56,9 +57,41 @@
   flex-direction: column;
 }
 
-.submitBtn {
+.passwordInputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordInput {
+  padding-right: 2.5rem !important;
   width: 100%;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.eyeButton:hover {
+  color: #111827;
+}
+
+.submitBtn {
+  width: 316px;
+  height: 44px;
+  border-radius: 10px;
   margin-top: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .footer {

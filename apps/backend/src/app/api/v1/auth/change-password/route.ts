@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@safegrow/db";
-import { requireAuth } from "../../../../lib/auth";
+import { verifyAuth } from "../../../../../lib/auth";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireAuth(request);
+    const user = verifyAuth(request);
     
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

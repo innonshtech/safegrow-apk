@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import AdminLayout from '../../../components/AdminLayout';
 import styles from './page.module.css';
-import { createEmployeeAction, getManagersAction } from './actions';
+import { createEmployeeAction, getManagersAction, recreatePasswordAction } from './actions';
 
 export default function AddEmployeePage() {
   const [isSuccess, setIsSuccess] = useState(false);
@@ -59,6 +59,13 @@ export default function AddEmployeePage() {
     setUserId('');
     setEmail('');
     setTempPassword('');
+  };
+
+  const handleRecreatePassword = async () => {
+    const res = await recreatePasswordAction(userId);
+    if (res.success && res.newPassword) {
+      setTempPassword(res.newPassword);
+    }
   };
 
   return (
@@ -167,8 +174,8 @@ export default function AddEmployeePage() {
               </div>
 
               <div className={styles.footer}>
-                <Link href="/employees" className="btn btn-outline">Cancel</Link>
-                <button type="submit" className="btn btn-primary" disabled={isPending}>
+                <Link href="/employees" className={`btn btn-outline ${styles.cancelBtn}`}>Cancel</Link>
+                <button type="submit" className={`btn btn-primary ${styles.submitBtn}`} disabled={isPending}>
                   {isPending ? 'Creating...' : 'Create employee'}
                 </button>
               </div>
@@ -197,8 +204,14 @@ export default function AddEmployeePage() {
                 </div>
               </div>
 
+              <div className={styles.recreateRow}>
+                <button type="button" className={styles.recreateBtn} onClick={handleRecreatePassword}>
+                  Recreate Password
+                </button>
+              </div>
+
               <div className={styles.successFooter}>
-                <button type="button" className="btn btn-outline" onClick={handleAddAnother}>Add another</button>
+                <button type="button" className={`btn btn-outline ${styles.addAnotherBtn}`} onClick={handleAddAnother}>Add another</button>
                 <button type="button" className={`btn btn-primary ${styles.doneBtn}`}>
                   <Link href="/employees">Done</Link>
                 </button>

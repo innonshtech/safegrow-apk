@@ -61,3 +61,28 @@ export async function getManagersAction() {
     return { error: 'Failed to fetch managers' };
   }
 }
+
+export async function recreatePasswordAction(userId: string) {
+  try {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let newPassword = '';
+    for (let i = 0; i < 5; i++) {
+      newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+    await prisma.user.update({
+      where: { userId },
+      data: {
+        passwordHash,
+        plainPassword: newPassword
+      }
+    });
+    
+    return { success: true, newPassword };
+  } catch (err) {
+    console.error('Error recreating password:', err);
+    return { error: 'Failed to recreate password' };
+  }
+}
