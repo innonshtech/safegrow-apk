@@ -12,7 +12,7 @@ applications:
         build:
           commands:
             # Build the backend specifically using next build directly
-            - npx next build
+            - pnpm run build
       artifacts:
         baseDirectory: .next
         files:
