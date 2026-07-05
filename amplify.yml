@@ -12,7 +12,7 @@ applications:
         build:
           commands:
             # Build the backend specifically
-            - cd ../.. && pnpm run build --filter backend
+            - cd ../.. && npx turbo run build --filter backend
       artifacts:
         baseDirectory: .next
         files:
