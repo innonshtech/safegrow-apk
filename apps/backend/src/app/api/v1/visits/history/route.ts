@@ -7,10 +7,10 @@ import { withErrorHandler } from "../../../../../lib/apiHandler";
 import { UnauthorizedError } from "../../../../../lib/errors";
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
+  region: process.env.S3_REGION!,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -32,7 +32,7 @@ export const GET = withErrorHandler(async (request: Request) => {
     });
 
     // Generate presigned URLs for photos
-    const bucketUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/`;
+    const bucketUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION}.amazonaws.com/`;
     
     const visitsWithPresignedUrls = await Promise.all(
       visits.map(async (visit) => {
@@ -40,7 +40,7 @@ export const GET = withErrorHandler(async (request: Request) => {
           try {
             const key = visit.photoUrl.replace(bucketUrl, '');
             const command = new GetObjectCommand({
-              Bucket: process.env.AWS_S3_BUCKET_NAME!,
+              Bucket: process.env.S3_BUCKET_NAME!,
               Key: key,
             });
             // URL valid for 1 hour

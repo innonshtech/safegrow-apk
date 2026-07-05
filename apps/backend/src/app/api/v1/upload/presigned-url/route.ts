@@ -6,10 +6,10 @@ import { withErrorHandler } from '../../../../../lib/apiHandler';
 import { UnauthorizedError, AppError } from '../../../../../lib/errors';
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
+  region: process.env.S3_REGION!,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -36,7 +36,7 @@ export const POST = withErrorHandler(async (request: Request) => {
 
     // Create put command
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_S3_BUCKET_NAME!,
+      Bucket: process.env.S3_BUCKET_NAME!,
       Key: fileName,
       ContentType: contentType,
     });
@@ -45,7 +45,7 @@ export const POST = withErrorHandler(async (request: Request) => {
     const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // 1 hour
 
     // Construct the public URL (if the bucket is public)
-    const publicUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    const publicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION}.amazonaws.com/${fileName}`;
 
   return NextResponse.json({
     presignedUrl,
