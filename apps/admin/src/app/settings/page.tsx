@@ -38,7 +38,7 @@ export default async function SettingsPage() {
           <h2 className={styles.cardTitle}>Change password</h2>
           <p className={styles.cardDesc}>Use at least 8 characters with a mix of letters and numbers.</p>
           
-          <form className={styles.form} action={updatePasswordAction}>
+          <form className={styles.form} action={updatePasswordAction as any}>
             <div className={styles.inputGroup}>
               <label className="label">Current password</label>
               <div className={styles.inputWrapper}>

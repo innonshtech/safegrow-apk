@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: result.error.errors }, { status: 400 });
     }
 
-    const { attendanceId, time, lat, lng, photoUrl, buyerName, outcome, notes } = result.data;
+    const { attendanceId, time, lat, lng, photoUrl, vendorName, outcome, notes } = result.data;
 
     // Verify attendance belongs to user
     const attendance = await prisma.attendance.findUnique({
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         lat,
         lng,
         photoUrl,
-        vendorName: buyerName || "Unknown Buyer",
+        vendorName,
         area: "Unknown Area", // Add default area
         outcome,
         notes

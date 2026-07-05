@@ -28,7 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <span className={styles.logoText}>SafeGrow</span>
         </div>
-        <form action={logoutAction}>
+        <form action={logoutAction as any}>
           <button type="submit" style={{ background: 'none', border: 'none', color: 'var(--text-muted)' }}>
             <LogOut size={20} />
           </button>
@@ -66,7 +66,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className={styles.sidebarBottom}>
-          <form action={logoutAction}>
+          <form action={logoutAction as any}>
             <button type="submit" className={styles.logoutBtn}>
               <LogOut size={18} />
               Log out

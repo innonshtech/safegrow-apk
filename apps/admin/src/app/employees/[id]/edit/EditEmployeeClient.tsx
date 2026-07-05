@@ -47,7 +47,7 @@ export default function EditEmployeeClient({ employee, managers }: { employee: a
           </div>
         </div>
 
-        <form action={updateEmployeeAction} className={styles.form}>
+        <form action={updateEmployeeAction as any} className={styles.form}>
           <input type="hidden" name="id" value={employee.id} />
           
           <div className={styles.section}>
@@ -172,7 +172,7 @@ export default function EditEmployeeClient({ employee, managers }: { employee: a
               <span>Moves to Inactive — findable under the Inactive filter.</span>
             </div>
 
-            <form action={deactivateEmployeeAction} className={styles.modalActions}>
+            <form action={deactivateEmployeeAction as any} className={styles.modalActions}>
               <input type="hidden" name="id" value={employee.id} />
               <button type="button" className="btn btn-outline" onClick={() => setShowDeactivateModal(false)} style={{ flex: 1 }}>Cancel</button>
               <button type="submit" className={styles.btnDanger} style={{ flex: 1 }}>Deactivate</button>
@@ -193,7 +193,7 @@ export default function EditEmployeeClient({ employee, managers }: { employee: a
               {employee.name} manages {repsCount} representatives. Move them to another manager before deactivating, so no rep is left unassigned.
             </p>
 
-            <form action={deactivateEmployeeAction} className={styles.reassignForm}>
+            <form action={deactivateEmployeeAction as any} className={styles.reassignForm}>
               <input type="hidden" name="id" value={employee.id} />
               
               <div className={styles.inputGroup} style={{ textAlign: 'left', marginBottom: '2rem' }}>

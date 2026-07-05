@@ -7,21 +7,53 @@
 
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
-✓ Compiled successfully in 4.6s
+✓ Compiled successfully in 3.9s
   Running TypeScript ...
-Failed to type check.
+  Finished TypeScript in 5.6s ...
+  Collecting page data using 11 workers ...
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+  Generating static pages using 11 workers (0/18) ...
+  Generating static pages using 11 workers (4/18) 
+[DB PACKAGE] DATABASE_URL IS: DEFINED
+  Generating static pages using 11 workers (8/18) 
+  Generating static pages using 11 workers (13/18) 
+✓ Generating static pages using 11 workers (18/18) in 1001ms
+  Finalizing page optimization ...
 
-./src/app/api/v1/tracking/batch/route.ts:37:7
-Type error: Type '{ attendanceId: string; time: Date; lat: number; lng: number; accuracy: number | null; speed: number | null; }[]' is not assignable to type 'LocationPingCreateManyInput | LocationPingCreateManyInput[]'.
-  Type '{ attendanceId: string; time: Date; lat: number; lng: number; accuracy: number | null; speed: number | null; }[]' is not assignable to type 'LocationPingCreateManyInput[]'.
-    Property 'userId' is missing in type '{ attendanceId: string; time: Date; lat: number; lng: number; accuracy: number | null; speed: number | null; }' but required in type 'LocationPingCreateManyInput'.
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /alerts
+├ ƒ /api/auth/login
+├ ƒ /api/v1/admin/employees
+├ ƒ /api/v1/attendance/check-in
+├ ƒ /api/v1/attendance/check-out
+├ ƒ /api/v1/auth/login
+├ ƒ /api/v1/auth/refresh
+├ ƒ /api/v1/tracking/batch
+├ ƒ /api/v1/visits
+├ ƒ /api/v1/visits/history
+├ ○ /employees
+├ ƒ /employees/[id]
+├ ƒ /employees/[id]/edit
+├ ○ /employees/new
+├ ○ /login
+└ ƒ /settings
 
-  [90m35 |[0m
-  [90m36 |[0m     [36mawait[0m prisma.locationPing.createMany({
-[31m[1m>[0m [90m37 |[0m       data: pings.map((ping) => ({
-  [90m   |[0m       [31m[1m^[0m
-  [90m38 |[0m         attendanceId: ping.attendanceId,
-  [90m39 |[0m         time: [36mnew[0m [33mDate[0m(ping.time),
-  [90m40 |[0m         lat: ping.lat,
-Next.js build worker exited with code: 1 and signal: null
- ELIFECYCLE  Command failed with exit code 1.
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

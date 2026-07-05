@@ -19,7 +19,7 @@ export default function LoginPage() {
           <p className={styles.subtitle}>Sign in to manage your field team</p>
         </div>
 
-        <form className={styles.form} action={loginAction}>
+        <form className={styles.form} action={loginAction as any}>
           <div className={styles.inputGroup}>
             <label className="label" htmlFor="email">Email or User ID</label>
             <input 

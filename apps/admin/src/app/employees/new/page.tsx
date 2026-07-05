@@ -82,7 +82,7 @@ export default function AddEmployeePage() {
 
         <div className={styles.content}>
           {!isSuccess ? (
-            <form className={styles.form} action={handleAction}>
+            <form className={styles.form} action={handleAction as any}>
               {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
               <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Role</h3>
