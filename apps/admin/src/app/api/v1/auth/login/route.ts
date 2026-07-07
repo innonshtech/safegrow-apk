@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { LoginRequestSchema, AuthResponse } from "@safegrow/shared";
 import { prisma } from "@safegrow/db";

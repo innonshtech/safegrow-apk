@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { prisma } from "@safegrow/db";
 import { verifyAuth } from "../../../../../lib/auth";
