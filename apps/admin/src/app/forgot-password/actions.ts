@@ -9,7 +9,7 @@ export async function requestPasswordResetAction(prevState: any, formData: FormD
   const email = formData.get('email') as string;
 
   if (!email) {
-    return { step: 1, error: 'Email or User ID is required' };
+    return { ...prevState, step: 1, error: 'Email or User ID is required', success: '' };
   }
 
   try {
@@ -21,7 +21,7 @@ export async function requestPasswordResetAction(prevState: any, formData: FormD
 
     if (!user || !user.email) {
       // Return a generic message to prevent user enumeration
-      return { step: 2, email: email, success: 'If that email exists in our system, a reset code has been sent.' };
+      return { ...prevState, step: 2, email: email, success: 'If that email exists in our system, a reset code has been sent.', error: '' };
     }
 
     // Generate 6-digit OTP
@@ -79,10 +79,10 @@ export async function requestPasswordResetAction(prevState: any, formData: FormD
       html: htmlTemplate,
     });
 
-    return { step: 2, email: user.email, success: 'Reset code sent successfully' };
+    return { ...prevState, step: 2, email: user.email, success: 'Reset code sent successfully', error: '' };
   } catch (err) {
     console.error('Request password reset error:', err);
-    return { step: 1, error: 'Failed to send reset code. Please try again.' };
+    return { ...prevState, step: 1, error: 'Failed to send reset code. Please try again.', success: '' };
   }
 }
 
@@ -93,11 +93,11 @@ export async function verifyAndResetPasswordAction(prevState: any, formData: For
   const newPassword = formData.get('newPassword') as string;
 
   if (!email || !otp || !newPassword) {
-    return { step: 2, email, error: 'All fields are required' };
+    return { ...prevState, step: 2, email, error: 'All fields are required', success: '' };
   }
 
   if (newPassword.length < 6) {
-    return { step: 2, email, error: 'Password must be at least 6 characters' };
+    return { ...prevState, step: 2, email, error: 'Password must be at least 6 characters', success: '' };
   }
 
   try {
@@ -106,15 +106,15 @@ export async function verifyAndResetPasswordAction(prevState: any, formData: For
     });
 
     if (!user) {
-      return { step: 2, email, error: 'Invalid or expired code' };
+      return { ...prevState, step: 2, email, error: 'Invalid or expired code', success: '' };
     }
 
     if (user.resetOtp !== otp) {
-      return { step: 2, email, error: 'Invalid verification code' };
+      return { ...prevState, step: 2, email, error: 'Invalid verification code', success: '' };
     }
 
     if (!user.resetOtpExpiry || user.resetOtpExpiry < new Date()) {
-      return { step: 2, email, error: 'Verification code has expired' };
+      return { ...prevState, step: 2, email, error: 'Verification code has expired', success: '' };
     }
 
     // Valid OTP! Hash new password
@@ -131,9 +131,9 @@ export async function verifyAndResetPasswordAction(prevState: any, formData: For
       }
     });
 
-    return { step: 3, success: 'Password reset successfully!' };
+    return { ...prevState, step: 3, success: 'Password reset successfully!', error: '' };
   } catch (err) {
     console.error('Reset password error:', err);
-    return { step: 2, email, error: 'Failed to reset password. Please try again.' };
+    return { ...prevState, step: 2, email, error: 'Failed to reset password. Please try again.', success: '' };
   }
 }
