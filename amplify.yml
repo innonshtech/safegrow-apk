@@ -9,7 +9,11 @@ applications:
             - cd ../.. && pnpm install
         build:
           commands:
+            - cd ../.. && pnpm --filter @safegrow/db generate
             - pnpm run build
+            - mkdir -p .next/standalone/node_modules
+            - cp -r ../../node_modules/@prisma .next/standalone/node_modules/ || true
+            - cp -r ../../node_modules/.prisma .next/standalone/node_modules/ || true
       artifacts:
         baseDirectory: .next
         files:
@@ -29,7 +33,11 @@ applications:
             - cd ../.. && pnpm install
         build:
           commands:
+            - cd ../.. && pnpm --filter @safegrow/db generate
             - pnpm run build
+            - mkdir -p .next/standalone/node_modules
+            - cp -r ../../node_modules/@prisma .next/standalone/node_modules/ || true
+            - cp -r ../../node_modules/.prisma .next/standalone/node_modules/ || true
       artifacts:
         baseDirectory: .next
         files:
