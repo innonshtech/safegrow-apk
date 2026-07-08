@@ -1,12 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useActionState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { loginAction } from './actions';
 import styles from './page.module.css';
 
+const initialState = {
+  error: '',
+};
+
 export default function LoginPage() {
+  const [state, formAction] = useActionState(loginAction as any, initialState);
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -14,12 +19,18 @@ export default function LoginPage() {
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logoContainer}>
-            <Image src="/logo 1.svg" alt="SafeGrow Logo" width={120} height={150} style={{ objectFit: 'contain' }} />
+            <Image src="/logo 1.svg" alt="SafeGrow Logo" width={120} height={150} style={{ objectFit: 'contain' }} priority />
           </div>
           <p className={styles.subtitle}>Sign in to manage your field team</p>
         </div>
 
-        <form className={styles.form} action={loginAction as any}>
+        {state?.error && (
+          <div style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '10px', borderRadius: '6px', fontSize: '14px', marginBottom: '16px', textAlign: 'center' }}>
+            {state.error}
+          </div>
+        )}
+
+        <form className={styles.form} action={formAction}>
           <div className={styles.inputGroup}>
             <label className="label" htmlFor="email">Email or User ID</label>
             <input 

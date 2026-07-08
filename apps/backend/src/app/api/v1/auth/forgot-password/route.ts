@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins expiry
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins expiry
 
     await prisma.user.update({
       where: { id: user.id },

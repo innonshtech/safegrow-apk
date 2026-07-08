@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(prevState: any, formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 

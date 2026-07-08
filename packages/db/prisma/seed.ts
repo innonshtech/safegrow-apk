@@ -8,33 +8,21 @@ async function main() {
   const passwordHash = await bcrypt.hash('password123', 10);
 
   const admin = await prisma.user.upsert({
-    where: { userId: 'ramesh.kale' },
-    update: {},
+    where: { email: 'admin@safegrow.com' },
+    update: {
+      name: 'System Admin' // Changed from Ramesh Kale to a generic name
+    },
     create: {
-      userId: 'ramesh.kale',
+      userId: 'admin',
       email: 'admin@safegrow.com',
       passwordHash,
-      name: 'Ramesh Kale',
+      name: 'System Admin',
       role: 'ADMIN',
       status: 'ACTIVE',
     },
   });
 
-  const rep = await prisma.user.upsert({
-    where: { userId: 'siya.goyal' },
-    update: {},
-    create: {
-      userId: 'siya.goyal',
-      email: 'siya.goyal@safegrow.com',
-      passwordHash,
-      name: 'Siya Goyal',
-      role: 'REP',
-      status: 'ACTIVE',
-    },
-  });
-
-  console.log(`Created admin user: ${admin.userId}`);
-  console.log(`Created rep user: ${rep.userId}`);
+  console.log(`Created master admin user: ${admin.email}`);
   console.log('Seeding finished.');
 }
 
