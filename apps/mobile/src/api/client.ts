@@ -5,8 +5,8 @@ import { store } from '../store';
 import { logout } from '../features/auth/store/authSlice';
 import { globalToast } from '../components/ui/ToastProvider';
 
-// const baseURL = Config.API_URL || 'https://main.dsdfc7hjrjp5f.amplifyapp.com/api/v1';
-const baseURL = 'http://192.168.1.37:3001/api/v1';
+const baseURL = Config.API_URL || 'https://main.dsdfc7hjrjp5f.amplifyapp.com/api/v1';
+// const baseURL = 'http://192.168.1.37:3001/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
