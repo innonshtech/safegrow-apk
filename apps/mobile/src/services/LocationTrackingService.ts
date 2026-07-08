@@ -53,6 +53,7 @@ class LocationTrackingService {
 
     const state = await BackgroundGeolocation.getState();
     if (!state.enabled) {
+      await BackgroundGeolocation.setOdometer(0);
       await BackgroundGeolocation.start();
     }
   }

@@ -60,9 +60,9 @@ export const LoginScreen = () => {
       style={styles.container}
     >
       <View style={styles.content}>
-        {/* Logo Placeholder */}
+        {/* Logo */}
         <View style={styles.logoContainer}>
-          <View style={styles.logoPlaceholder} />
+          <Image source={require('../../../assets/logo.png')} style={styles.logoImage} resizeMode="contain" />
         </View>
 
         <Text style={styles.subtitle}>Field sales · log in to continue</Text>
@@ -124,11 +124,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: theme.spacing.lg,
   },
-  logoPlaceholder: {
-    width: 100,
-    height: 100,
-    backgroundColor: theme.colors.primaryLight,
-    borderRadius: theme.radius.md,
+  logoImage: {
+    width: 150,
+    height: 150,
   },
   subtitle: {
     fontFamily: theme.fonts.regular,
