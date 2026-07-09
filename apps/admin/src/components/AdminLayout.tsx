@@ -69,7 +69,7 @@ function AdminLayoutContent({ children, navItems, pathname }: any) {
         </div>
 
         <nav className={styles.nav}>
-          {navItems.map((item) => {
+          {navItems.map((item: any) => {
             const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
             const Icon = item.icon;
             
