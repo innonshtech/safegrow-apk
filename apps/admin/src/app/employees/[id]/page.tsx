@@ -10,10 +10,10 @@ import styles from './page.module.css';
 import RouteMap from './RouteMap';
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
+  region: process.env.S3_REGION!,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -22,7 +22,7 @@ async function getPresignedUrl(photoUrl: string | null): Promise<string | null> 
   if (!photoUrl.includes('amazonaws.com')) return photoUrl;
 
   try {
-    const bucketName = process.env.AWS_S3_BUCKET_NAME!;
+    const bucketName = process.env.S3_BUCKET_NAME!;
     const urlParts = new URL(photoUrl);
     const key = urlParts.pathname.substring(1);
 
@@ -43,11 +43,11 @@ function getInitials(name: string) {
 }
 
 function formatTime(date: Date) {
-  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(date));
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(date));
 }
 
 function formatDate(date: Date) {
-  return new Intl.DateTimeFormat('en-US', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(date));
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(date));
 }
 
 export default async function EmployeeDetailPage({ 

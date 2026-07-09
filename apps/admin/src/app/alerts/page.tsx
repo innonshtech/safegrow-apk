@@ -5,7 +5,7 @@ import styles from './page.module.css';
 import { prisma } from '@safegrow/db';
 
 function formatTime(date: Date) {
-  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(date));
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(date));
 }
 
 function formatDate(date: Date) {
@@ -15,7 +15,7 @@ function formatDate(date: Date) {
   
   if (date.toDateString() === today.toDateString()) return 'today';
   if (date.toDateString() === yesterday.toDateString()) return 'yesterday';
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric' }).format(date);
 }
 
 export default async function AlertsPage() {
