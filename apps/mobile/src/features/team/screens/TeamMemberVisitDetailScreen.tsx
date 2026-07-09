@@ -31,7 +31,7 @@ export const TeamMemberVisitDetailScreen = () => {
 
       {/* Media (Photo or Map fallback) */}
       <View style={styles.mediaContainer}>
-        {visit.photoUrl ? (
+        {visit.photoUrl && typeof visit.photoUrl === 'string' && visit.photoUrl.startsWith('http') ? (
           <Image source={{ uri: visit.photoUrl }} style={styles.media} resizeMode="cover" />
         ) : (
           <MapView

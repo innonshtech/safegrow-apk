@@ -8,13 +8,21 @@ import { apiClient } from '../../../api/client';
 export const MyAttendanceScreen = () => {
   const navigation = useNavigation<any>();
   const [attendances, setAttendances] = useState<any[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
         const response = await apiClient.get('/attendance/history');
-        setAttendances(response.data);
+        if (response.data.attendances) {
+          setAttendances(response.data.attendances);
+          setRequests(response.data.requests || []);
+        } else {
+          // fallback if API hasn't been updated yet on the server
+          setAttendances(response.data);
+          setRequests([]);
+        }
       } catch (error) {
         console.error('Failed to fetch attendance history:', error);
       } finally {
@@ -64,7 +72,7 @@ export const MyAttendanceScreen = () => {
       if (dayOfWeek !== 0) {
         // Adjust for local time zone to get correct YYYY-MM-DD
         const dateString = new Date(iterDate.getTime() - (iterDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-        marks[dateString] = { selected: true, selectedColor: theme.colors.error, customStyles: { container: { borderRadius: 8 } } };
+        marks[dateString] = { selected: true, selectedColor: theme.colors.danger, customStyles: { container: { borderRadius: 8 } } };
       }
     }
 
@@ -74,9 +82,20 @@ export const MyAttendanceScreen = () => {
       const dateString = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
       const status = getStatus(att);
       if (status === 'Complete') {
-        marks[dateString] = { selected: true, selectedColor: theme.colors.success, customStyles: { container: { borderRadius: 8 } } };
+        marks[dateString] = { selected: true, selectedColor: theme.colors.primary, customStyles: { container: { borderRadius: 8 } } };
       } else if (status === 'Incomplete') {
-        marks[dateString] = { selected: true, selectedColor: '#D97706', customStyles: { container: { borderRadius: 8 } } }; // Warning amber
+        marks[dateString] = { selected: true, selectedColor: theme.colors.danger, customStyles: { container: { borderRadius: 8 } } }; // Red for missed entries
+      }
+    });
+
+    // Add yellow/amber marks for pending requests if they don't override a complete day
+    requests.forEach(req => {
+      if (req.status === 'PENDING') {
+        const dateObj = new Date(req.date);
+        const dateString = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+        if (!marks[dateString] || marks[dateString].selectedColor !== theme.colors.primary) {
+           marks[dateString] = { selected: true, selectedColor: theme.colors.warning, customStyles: { container: { borderRadius: 8 } } };
+        }
       }
     });
 
@@ -85,6 +104,16 @@ export const MyAttendanceScreen = () => {
 
   const handleDayPress = (day: any) => {
     const dateStr = day.dateString; // YYYY-MM-DD
+    
+    // Prevent applying for future dates
+    const today = new Date();
+    const todayStr = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    
+    if (dateStr > todayStr) {
+      Alert.alert('Invalid Date', 'You can only apply for past attendance, not future.');
+      return;
+    }
+
     // Pass the selected date to the manual request screen
     navigation.navigate('ManualAttendanceRequest', { date: dateStr });
   };
@@ -137,7 +166,52 @@ export const MyAttendanceScreen = () => {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Recent days</Text>
+        <Text style={styles.sectionTitle}>Manual Requests</Text>
+        
+        {requests.length === 0 ? (
+          <Text style={styles.emptyText}>No manual requests found.</Text>
+        ) : (
+          <View style={styles.listContainer}>
+            {requests.map((item, index) => {
+              const dateStr = new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+              
+              let statusPillStyle = styles.statusPillNeutral;
+              let statusTextStyle = styles.statusTextNeutral;
+              
+              if (item.status === 'APPROVED') {
+                statusPillStyle = styles.statusPillSuccess;
+                statusTextStyle = styles.statusTextSuccess;
+              } else if (item.status === 'PENDING') {
+                statusPillStyle = styles.statusPillWarning;
+                statusTextStyle = styles.statusTextWarning;
+              } else if (item.status === 'REJECTED') {
+                statusPillStyle = styles.statusPillDanger;
+                statusTextStyle = styles.statusTextDanger;
+              }
+
+              return (
+                <View key={item.id}>
+                  <View style={styles.listItem}>
+                    <View style={styles.listItemLeft}>
+                      <Text style={styles.itemDate}>{dateStr}</Text>
+                      <Text style={styles.itemTime} numberOfLines={1}>Reason: {item.reason}</Text>
+                    </View>
+                    <View style={styles.listItemRight}>
+                      <View style={[styles.statusPill, statusPillStyle]}>
+                        <Text style={[styles.statusText, statusTextStyle]}>
+                          {item.status}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  {index < requests.length - 1 && <View style={styles.divider} />}
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Recent days</Text>
 
         {/* List */}
         <View style={styles.listContainer}>
@@ -163,12 +237,14 @@ export const MyAttendanceScreen = () => {
                     {hours && <Text style={styles.itemHours}>{hours}</Text>}
                     <View style={[
                       styles.statusPill, 
-                      status === 'Incomplete' && styles.statusPillWarning,
+                      status === 'Complete' && styles.statusPillSuccess,
+                      status === 'Incomplete' && styles.statusPillDanger,
                       status === 'Off' && styles.statusPillNeutral
                     ]}>
                       <Text style={[
                         styles.statusText,
-                        status === 'Incomplete' && styles.statusTextWarning,
+                        status === 'Complete' && styles.statusTextSuccess,
+                        status === 'Incomplete' && styles.statusTextDanger,
                         status === 'Off' && styles.statusTextNeutral
                       ]}>
                         {status}
@@ -181,6 +257,8 @@ export const MyAttendanceScreen = () => {
             );
           })}
         </View>
+        
+        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
@@ -296,7 +374,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statusPill: {
-    backgroundColor: 'rgba(76, 175, 80, 0.1)', // Light green
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: theme.radius.pill,
@@ -304,19 +381,36 @@ const styles = StyleSheet.create({
   statusText: {
     fontFamily: theme.fonts.medium,
     fontSize: 11,
-    color: theme.colors.success,
+  },
+  statusPillSuccess: {
+    backgroundColor: 'rgba(46, 125, 50, 0.1)', 
+  },
+  statusTextSuccess: {
+    color: theme.colors.primary,
+  },
+  statusPillDanger: {
+    backgroundColor: 'rgba(179, 38, 30, 0.1)',
+  },
+  statusTextDanger: {
+    color: theme.colors.danger,
   },
   statusPillWarning: {
-    backgroundColor: 'rgba(217, 119, 6, 0.1)', // Light amber
+    backgroundColor: 'rgba(138, 90, 0, 0.1)', 
   },
   statusTextWarning: {
-    color: '#D97706',
+    color: theme.colors.warning,
   },
   statusPillNeutral: {
     backgroundColor: theme.colors.surfaceSecondary,
   },
   statusTextNeutral: {
     color: theme.colors.inkLight,
+  },
+  emptyText: {
+    fontFamily: theme.fonts.regular,
+    fontSize: 14,
+    color: theme.colors.inkLight,
+    fontStyle: 'italic',
   },
   divider: {
     height: 1,

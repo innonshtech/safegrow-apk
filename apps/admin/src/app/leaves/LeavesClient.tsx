@@ -5,11 +5,16 @@ import styles from './page.module.css';
 export default function LeavesClient({ initialRequests }: { initialRequests: any[] }) {
   const [requests, setRequests] = useState(initialRequests);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleUpdate = async (id: string, status: string) => {
     setLoadingId(id);
     try {
-      const res = await fetch('http://localhost:3001/api/v1/admin/attendance-requests', {
+      const res = await fetch('/api/v1/admin/attendance-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ requestId: id, status })
@@ -46,9 +51,15 @@ export default function LeavesClient({ initialRequests }: { initialRequests: any
         </thead>
         <tbody>
           {requests.map(req => {
-            const dateStr = new Date(req.date).toLocaleDateString();
-            const inStr = req.checkInTime ? new Date(req.checkInTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '--';
-            const outStr = req.checkOutTime ? new Date(req.checkOutTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '--';
+            let dateStr = '';
+            let inStr = '';
+            let outStr = '';
+            
+            if (mounted) {
+              dateStr = new Date(req.date).toLocaleDateString();
+              inStr = req.checkInTime ? new Date(req.checkInTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '--';
+              outStr = req.checkOutTime ? new Date(req.checkOutTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '--';
+            }
             
             return (
               <tr key={req.id}>

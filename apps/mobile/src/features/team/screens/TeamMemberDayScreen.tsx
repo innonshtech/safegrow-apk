@@ -12,20 +12,36 @@ export const TeamMemberDayScreen = () => {
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     const fetchDay = async () => {
+      setLoading(true);
       try {
-        const response = await apiClient.get(`/manager/team/${memberId}/day`);
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const response = await apiClient.get(`/manager/team/${memberId}/day?date=${dateStr}`);
         setData(response.data.attendance);
       } catch (error) {
         console.error('Failed to fetch team member day', error);
+        setData(null);
       } finally {
         setLoading(false);
       }
     };
     fetchDay();
-  }, [memberId]);
+  }, [memberId, currentDate]);
+
+  const handlePrevDay = () => {
+    const prev = new Date(currentDate);
+    prev.setDate(prev.getDate() - 1);
+    setCurrentDate(prev);
+  };
+
+  const handleNextDay = () => {
+    const next = new Date(currentDate);
+    next.setDate(next.getDate() + 1);
+    setCurrentDate(next);
+  };
 
   if (loading) {
     return (
@@ -40,12 +56,22 @@ export const TeamMemberDayScreen = () => {
     return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const initialRegion = data?.route?.length > 0 ? {
-    latitude: data.route[0].latitude,
-    longitude: data.route[0].longitude,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  } : undefined;
+  let initialRegion;
+  if (data?.route?.length > 0) {
+    initialRegion = {
+      latitude: data.route[0].latitude,
+      longitude: data.route[0].longitude,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    };
+  } else if (data?.visits?.length > 0) {
+    initialRegion = {
+      latitude: data.visits[0].lat,
+      longitude: data.visits[0].lng,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    };
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -58,14 +84,24 @@ export const TeamMemberDayScreen = () => {
         <Text style={styles.headerSubtitle}>Pune territory</Text>
       </View>
 
-      {/* Date Selector (Static for MVP) */}
+      {/* Date Selector */}
       <View style={styles.dateSelector}>
-        <Text style={styles.chevron}>‹</Text>
-        <Text style={styles.dateText}>{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</Text>
-        <Text style={styles.chevron}>›</Text>
+        <TouchableOpacity onPress={handlePrevDay} style={styles.arrowButton}>
+          <Text style={styles.chevron}>‹</Text>
+        </TouchableOpacity>
+        <Text style={styles.dateText}>{currentDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</Text>
+        <TouchableOpacity onPress={handleNextDay} style={styles.arrowButton}>
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Metrics Row */}
+      {!data ? (
+        <View style={styles.noDataContainer}>
+          <Text style={styles.noDataText}>No data for this date.</Text>
+        </View>
+      ) : (
+        <>
+          {/* Metrics Row */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.metricsRow}>
         <View style={styles.metricPill}>
           <Text style={styles.metricText}>In {formatTime(data?.checkInTime)}</Text>
@@ -146,6 +182,8 @@ export const TeamMemberDayScreen = () => {
           <Text style={{ textAlign: 'center', marginTop: 20, color: theme.colors.inkLight }}>No visits for this day.</Text>
         )}
       </View>
+        </>
+      )}
     </ScrollView>
   );
 };
@@ -192,8 +230,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.ink,
   },
+  arrowButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
   chevron: {
-    fontSize: 20,
+    fontSize: 24,
+    color: theme.colors.ink,
+  },
+  noDataContainer: {
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noDataText: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 16,
     color: theme.colors.inkLight,
   },
   metricsRow: {

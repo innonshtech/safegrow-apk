@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../config/theme';
 import { apiClient } from '../../../api/client';
+import { globalToast } from '../../../components/ui/ToastProvider';
 
 export const ManualAttendanceRequestScreen = () => {
   const navigation = useNavigation<any>();
@@ -15,13 +16,52 @@ export const ManualAttendanceRequestScreen = () => {
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Strict time formatter: forces HH:MM format as user types
+  const handleTimeChange = (text: string, setter: (val: string) => void) => {
+    // 1. Remove all non-numeric characters
+    let cleaned = text.replace(/[^0-9]/g, '');
+    
+    // 2. Cap hours to 23
+    if (cleaned.length >= 2) {
+      const hours = parseInt(cleaned.slice(0, 2), 10);
+      if (hours > 23) {
+        cleaned = `23${cleaned.slice(2)}`;
+      }
+    }
+    
+    // 3. Auto-insert colon
+    if (cleaned.length >= 3) {
+      cleaned = `${cleaned.slice(0, 2)}:${cleaned.slice(2, 4)}`;
+    }
+
+    // 4. Cap minutes to 59
+    if (cleaned.length >= 5) {
+      const minutes = parseInt(cleaned.slice(3, 5), 10);
+      if (minutes > 59) {
+        cleaned = `${cleaned.slice(0, 2)}:59`;
+      }
+    }
+
+    setter(cleaned.slice(0, 5));
+  };
+
   const handleSubmit = async () => {
     if (!reason.trim()) {
-      Alert.alert('Error', 'Please provide a reason for the manual request.');
+      globalToast.show({ message: 'Please provide a reason for the manual request.', type: 'error' });
       return;
     }
     if (!checkInTime.trim() && !checkOutTime.trim()) {
-      Alert.alert('Error', 'Please provide either a Check-in time or Check-out time.');
+      globalToast.show({ message: 'Please provide either a Check-in time or Check-out time.', type: 'error' });
+      return;
+    }
+
+    // Ensure if a time is provided, it is fully complete (5 chars: HH:MM)
+    if (checkInTime.trim() && checkInTime.length < 5) {
+      globalToast.show({ message: 'Check-in time is incomplete. Please use HH:MM format.', type: 'error' });
+      return;
+    }
+    if (checkOutTime.trim() && checkOutTime.length < 5) {
+      globalToast.show({ message: 'Check-out time is incomplete. Please use HH:MM format.', type: 'error' });
       return;
     }
 
@@ -44,12 +84,11 @@ export const ManualAttendanceRequestScreen = () => {
       };
 
       await apiClient.post('/attendance/request', payload);
-      Alert.alert('Success', 'Attendance request submitted successfully. Awaiting admin approval.', [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      globalToast.show({ message: 'Attendance request submitted successfully. Awaiting admin approval.', type: 'success' });
+      navigation.goBack();
     } catch (error: any) {
       console.error('Submit error:', error);
-      Alert.alert('Error', error.response?.data?.error || 'Failed to submit request');
+      globalToast.show({ message: error.response?.data?.error || 'Failed to submit request', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -72,8 +111,9 @@ export const ManualAttendanceRequestScreen = () => {
           style={styles.input}
           placeholder="e.g. 09:30"
           value={checkInTime}
-          onChangeText={setCheckInTime}
-          keyboardType="numbers-and-punctuation"
+          onChangeText={(text) => handleTimeChange(text, setCheckInTime)}
+          keyboardType="number-pad"
+          maxLength={5}
         />
 
         <Text style={styles.label}>Check-out Time (HH:MM, 24hr)</Text>
@@ -81,8 +121,9 @@ export const ManualAttendanceRequestScreen = () => {
           style={styles.input}
           placeholder="e.g. 18:00"
           value={checkOutTime}
-          onChangeText={setCheckOutTime}
-          keyboardType="numbers-and-punctuation"
+          onChangeText={(text) => handleTimeChange(text, setCheckOutTime)}
+          keyboardType="number-pad"
+          maxLength={5}
         />
 
         <Text style={styles.label}>Reason *</Text>

@@ -20,7 +20,14 @@ export async function GET(request: Request) {
       take: 30 // fetch last 30 days
     });
 
-    return NextResponse.json(attendances);
+    // Fetch the user's manual requests
+    const requests = await prisma.attendanceRequest.findMany({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      take: 30
+    });
+
+    return NextResponse.json({ attendances, requests });
   } catch (error) {
     console.error("Attendance History Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
