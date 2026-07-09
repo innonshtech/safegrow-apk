@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import AdminLayout from '../../../components/AdminLayout';
-import styles from './page.module.css';
 import { createEmployeeAction, getManagersAction, recreatePasswordAction } from './actions';
+import { useToast } from '../../../components/Toast/ToastContext';
+import styles from './page.module.css';
 
 export default function AddEmployeePage() {
   const [isSuccess, setIsSuccess] = useState(false);
@@ -15,6 +16,8 @@ export default function AddEmployeePage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [isPending, setIsPending] = useState(false);
   const [managers, setManagers] = useState<{id: string, name: string}[]>([]);
+  const [joiningDate, setJoiningDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const { showToast } = useToast();
 
   React.useEffect(() => {
     getManagersAction().then(res => {
@@ -50,6 +53,7 @@ export default function AddEmployeePage() {
       setErrorMsg(res.error);
     } else if (res?.success) {
       setIsSuccess(true);
+      showToast(`${role} created successfully`, 'success');
     }
   };
 
@@ -137,15 +141,17 @@ export default function AddEmployeePage() {
               <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Assignment</h3>
                 <div className={styles.formRow}>
-                  <div className={styles.inputGroup}>
-                    <label className="label">Assigned manager</label>
-                    <select name="managerId" className="input">
-                      <option value="none">None</option>
-                      {managers.map(m => (
-                        <option key={m.id} value={m.id}>{m.name}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {role === 'Representative' ? (
+                    <div className={styles.inputGroup}>
+                      <label className="label">Assigned manager</label>
+                      <select name="managerId" className="input" required defaultValue="">
+                        <option value="" disabled>Select Manager</option>
+                        {managers.map(m => (
+                          <option key={m.id} value={m.id}>{m.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : <div className={styles.inputGroup}></div>}
                   <div className={styles.inputGroup}>
                     <label className="label">Territory / beat</label>
                     <input type="text" name="territory" className="input" placeholder="Pune – Hadapsar" />
@@ -158,7 +164,7 @@ export default function AddEmployeePage() {
                   </div>
                   <div className={styles.inputGroup}>
                     <label className="label">Joining date</label>
-                    <input type="date" name="joiningDate" className="input" required />
+                    <input type="date" name="joiningDate" className="input" value={joiningDate} onChange={e => setJoiningDate(e.target.value)} required />
                   </div>
                 </div>
               </div>
@@ -185,7 +191,7 @@ export default function AddEmployeePage() {
               <div className={styles.successIconWrapper}>
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
               </div>
-              <h2 className={styles.successTitle}>Employee created</h2>
+              <h2 className={styles.successTitle}>{role} created</h2>
               <p className={styles.successDesc}>{name} has been added as a {role}.</p>
 
               <div className={styles.credentialsBox}>

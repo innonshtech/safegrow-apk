@@ -66,11 +66,11 @@ export async function loginAction(prevState: any, formData: FormData) {
     return { error: 'Internal server error' };
   }
   
-  redirect('/');
+  redirect('/?login=success');
 }
 
 export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete('admin_token');
-  redirect('/login');
+  redirect('/login?logout=success');
 }

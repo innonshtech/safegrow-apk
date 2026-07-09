@@ -4,15 +4,40 @@ import React, { useState, useActionState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { loginAction } from './actions';
+import { useSearchParams } from 'next/navigation';
+import { useToast } from '../../components/Toast/ToastContext';
 import styles from './page.module.css';
+import { Suspense, useEffect } from 'react';
 
 const initialState = {
   error: '',
 };
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const [state, formAction] = useActionState(loginAction as any, initialState);
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (searchParams.get('error') === 'session_expired') {
+      showToast('Session expired. Please log in again.', 'error');
+      // Clean up the URL
+      window.history.replaceState({}, '', '/login');
+    }
+    if (searchParams.get('logout') === 'success') {
+      showToast('Logged out successfully', 'success');
+      window.history.replaceState({}, '', '/login');
+    }
+  }, [searchParams, showToast]);
 
   return (
     <div className={styles.container}>

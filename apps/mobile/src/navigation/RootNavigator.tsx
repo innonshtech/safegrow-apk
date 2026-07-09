@@ -21,6 +21,7 @@ import { VisitCameraScreen } from '../features/visit/screens/VisitCameraScreen';
 import { VisitConfirmScreen } from '../features/visit/screens/VisitConfirmScreen';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
 import { MyAttendanceScreen } from '../features/profile/screens/MyAttendanceScreen';
+import { ManualAttendanceRequestScreen } from '../features/attendance/screens/ManualAttendanceRequestScreen';
 import { MyVisitsScreen } from '../features/profile/screens/MyVisitsScreen';
 import { NotificationsScreen } from '../features/profile/screens/NotificationsScreen';
 import { ChangePasswordScreen } from '../features/profile/screens/ChangePasswordScreen';
@@ -129,6 +130,7 @@ export const RootNavigator = () => {
             <Stack.Screen name="VisitConfirm" component={VisitConfirmScreen} />
             
             <Stack.Screen name="MyAttendance" component={MyAttendanceScreen} />
+            <Stack.Screen name="ManualAttendanceRequest" component={ManualAttendanceRequestScreen} />
             <Stack.Screen name="MyVisits" component={MyVisitsScreen} />
             <Stack.Screen name="Notifications" component={NotificationsScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />

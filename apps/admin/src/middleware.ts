@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
       await jwtVerify(token, secret);
     } catch (err) {
       // Invalid token
-      return NextResponse.redirect(new URL('/login', request.nextUrl));
+      return NextResponse.redirect(new URL('/login?error=session_expired', request.nextUrl));
     }
   }
 

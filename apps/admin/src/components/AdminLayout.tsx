@@ -1,10 +1,12 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import styles from './AdminLayout.module.css';
 import { logoutAction } from '../app/login/actions';
-import { LayoutDashboard, Users, Bell, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Bell, Settings, LogOut, Calendar } from 'lucide-react';
+import { useToast } from './Toast/ToastContext';
+import { useEffect, Suspense } from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -13,8 +15,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Overview', href: '/', icon: LayoutDashboard },
     { name: 'Employees', href: '/employees', icon: Users },
     { name: 'Alerts', href: '/alerts', icon: Bell },
+    { name: 'Leaves', href: '/leaves', icon: Calendar },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminLayoutContent children={children} navItems={navItems} pathname={pathname} />
+    </Suspense>
+  );
+}
+
+function AdminLayoutContent({ children, navItems, pathname }: any) {
+  const searchParams = useSearchParams();
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (searchParams.get('login') === 'success') {
+      showToast('Login successful', 'success');
+      window.history.replaceState({}, '', '/');
+    }
+  }, [searchParams, showToast]);
 
   return (
     <div className={styles.container}>

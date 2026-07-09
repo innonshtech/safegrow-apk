@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Calendar } from 'react-native-calendars';
 import { theme } from '../../../config/theme';
 import { apiClient } from '../../../api/client';
 
@@ -48,6 +49,46 @@ export const MyAttendanceScreen = () => {
   
   const avgDay = presentDays > 0 ? (totalHoursFloat / presentDays).toFixed(1) : '0.0';
 
+  const getMarkedDates = () => {
+    const marks: any = {};
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Mark past days up to today as absent (red) if they are weekdays
+    for (let d = 1; d <= today.getDate(); d++) {
+      const iterDate = new Date(currentYear, currentMonth, d);
+      const dayOfWeek = iterDate.getDay();
+      
+      // Assume Sunday (0) is weekly off
+      if (dayOfWeek !== 0) {
+        // Adjust for local time zone to get correct YYYY-MM-DD
+        const dateString = new Date(iterDate.getTime() - (iterDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+        marks[dateString] = { selected: true, selectedColor: theme.colors.error, customStyles: { container: { borderRadius: 8 } } };
+      }
+    }
+
+    // Overwrite with actual attendances
+    attendances.forEach(att => {
+      const dateObj = new Date(att.date);
+      const dateString = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+      const status = getStatus(att);
+      if (status === 'Complete') {
+        marks[dateString] = { selected: true, selectedColor: theme.colors.success, customStyles: { container: { borderRadius: 8 } } };
+      } else if (status === 'Incomplete') {
+        marks[dateString] = { selected: true, selectedColor: '#D97706', customStyles: { container: { borderRadius: 8 } } }; // Warning amber
+      }
+    });
+
+    return marks;
+  };
+
+  const handleDayPress = (day: any) => {
+    const dateStr = day.dateString; // YYYY-MM-DD
+    // Pass the selected date to the manual request screen
+    navigation.navigate('ManualAttendanceRequest', { date: dateStr });
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -66,11 +107,18 @@ export const MyAttendanceScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Month Selector */}
-        <View style={styles.monthSelector}>
-          <Text style={styles.chevron}>‹</Text>
-          <Text style={styles.monthText}>March 2026</Text>
-          <Text style={styles.chevron}>›</Text>
+        {/* Calendar */}
+        <View style={styles.calendarContainer}>
+          <Calendar
+            markingType={'custom'}
+            markedDates={getMarkedDates()}
+            onDayPress={handleDayPress}
+            theme={{
+              todayTextColor: theme.colors.primary,
+              arrowColor: theme.colors.primary,
+            }}
+          />
+          <Text style={styles.calendarHint}>Tap a date to apply for manual check-in/out.</Text>
         </View>
 
         {/* Summary Metrics */}
@@ -162,26 +210,21 @@ const styles = StyleSheet.create({
   content: {
     padding: theme.spacing.lg,
   },
-  monthSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  calendarContainer: {
     backgroundColor: theme.colors.surface,
-    padding: theme.spacing.md,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: theme.colors.line,
     marginBottom: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+    overflow: 'hidden',
   },
-  chevron: {
-    fontSize: 20,
+  calendarHint: {
+    fontFamily: theme.fonts.regular,
+    fontSize: 12,
     color: theme.colors.inkLight,
-    paddingHorizontal: theme.spacing.sm,
-  },
-  monthText: {
-    fontFamily: theme.fonts.bold,
-    fontSize: 16,
-    color: theme.colors.ink,
+    textAlign: 'center',
+    marginTop: 8,
   },
   metricsRow: {
     flexDirection: 'row',
