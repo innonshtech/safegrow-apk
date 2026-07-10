@@ -9,7 +9,9 @@
   Creating an optimized production build ...
 Turbopack build encountered 1 warnings:
 [externals]/@prisma/client
+✓ Compiled successfully in 5.3s
 unexpected export *
+  Running TypeScript ...
 export * used with module [externals]/@prisma/client [external] (@prisma/client, cjs, [project]/packages/db/node_modules/@prisma/client) which is a CommonJS module with exports only available at runtime
 List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
 
@@ -20,9 +22,7 @@ Import trace:
     ./apps/backend/src/app/api/v1/visits/route.ts [App Route]
 
 
-✓ Compiled successfully in 3.7s
-  Running TypeScript ...
-  Finished TypeScript in 4.2s ...
+  Finished TypeScript in 6.4s ...
   Collecting page data using 11 workers ...
 [DB PACKAGE] DATABASE_URL IS: DEFINED
 [DB PACKAGE] DATABASE_URL IS: DEFINED
@@ -35,21 +35,23 @@ Import trace:
 [DB PACKAGE] DATABASE_URL IS: DEFINED
 [DB PACKAGE] DATABASE_URL IS: DEFINED
 [DB PACKAGE] DATABASE_URL IS: DEFINED
-  Generating static pages using 11 workers (0/20) ...
-  Generating static pages using 11 workers (5/20) 
-  Generating static pages using 11 workers (10/20) 
-  Generating static pages using 11 workers (15/20) 
-✓ Generating static pages using 11 workers (20/20) in 757ms
+  Generating static pages using 11 workers (0/22) ...
+  Generating static pages using 11 workers (5/22) 
+  Generating static pages using 11 workers (10/22) 
+  Generating static pages using 11 workers (16/22) 
+✓ Generating static pages using 11 workers (22/22) in 449ms
   Finalizing page optimization ...
 
 Route (app)
 ┌ ○ /
 ├ ○ /_not-found
 ├ ƒ /api/auth/login
+├ ƒ /api/v1/admin/attendance-requests
 ├ ƒ /api/v1/admin/employees
 ├ ƒ /api/v1/attendance/check-in
 ├ ƒ /api/v1/attendance/check-out
 ├ ƒ /api/v1/attendance/history
+├ ƒ /api/v1/attendance/request
 ├ ƒ /api/v1/auth/change-password
 ├ ƒ /api/v1/auth/forgot-password
 ├ ƒ /api/v1/auth/login

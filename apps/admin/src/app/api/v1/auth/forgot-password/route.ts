@@ -39,22 +39,30 @@ export async function POST(request: Request) {
     const maskedEmail = `${maskedName}@${domainPart}`;
 
     // Send email (in a real app this would go to a queue or background worker)
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.mailtrap.io",
-      port: parseInt(process.env.SMTP_PORT || "2525"),
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+    console.log(`[Forgot Password] Generated OTP for ${user.userId}: ${otp}`);
 
-    await transporter.sendMail({
-      from: '"SafeGrow Support" <noreply@safegrow.com>',
-      to: user.email,
-      subject: "Password Reset Code",
-      text: `Your password reset code is: ${otp}. It will expire in 15 minutes.`,
-      html: `<p>Your password reset code is: <strong>${otp}</strong>. It will expire in 15 minutes.</p>`,
-    });
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || "smtp.mailtrap.io",
+        port: parseInt(process.env.SMTP_PORT || "2525"),
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      await transporter.sendMail({
+        from: '"SafeGrow Support" <noreply@safegrow.com>',
+        to: user.email,
+        subject: "Password Reset Code",
+        text: `Your password reset code is: ${otp}. It will expire in 15 minutes.`,
+        html: `<p>Your password reset code is: <strong>${otp}</strong>. It will expire in 15 minutes.</p>`,
+      });
+      console.log(`[Forgot Password] Email sent successfully to ${user.email}`);
+    } catch (emailError) {
+      console.error("[Forgot Password] Failed to send email (SMTP configured incorrectly?):", emailError);
+      // Proceed without failing the request so dev can continue
+    }
 
     return NextResponse.json({ 
       success: true, 
