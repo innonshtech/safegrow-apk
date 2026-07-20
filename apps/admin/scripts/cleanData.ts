@@ -44,7 +44,7 @@ async function emptyS3Bucket() {
         const deleteCommand = new DeleteObjectsCommand({
           Bucket: BUCKET_NAME,
           Delete: {
-            Objects: listResponse.Contents.map((obj) => ({ Key: obj.Key })),
+            Objects: listResponse.Contents.map((obj) => ({ Key: obj.Key as string })),
           },
         });
 
