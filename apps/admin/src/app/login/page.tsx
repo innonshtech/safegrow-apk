@@ -44,7 +44,7 @@ function LoginContent() {
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logoContainer}>
-            <Image src="/logo 1.svg" alt="SafeGrow Logo" width={120} height={150} style={{ objectFit: 'contain' }} priority />
+            <Image src="/Safegrow_Logo.png" alt="SafeGrow Logo" width={120} height={150} style={{ objectFit: 'contain' }} priority />
           </div>
           <p className={styles.subtitle}>Sign in to manage your field team</p>
         </div>
@@ -63,7 +63,7 @@ function LoginContent() {
               name="email"
               id="email" 
               className="input" 
-              placeholder="admin@safegrow.com" 
+              placeholder="safegrowapp@gmail.com" 
               required
             />
           </div>

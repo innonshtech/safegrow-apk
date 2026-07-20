@@ -8,6 +8,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import AdminLayout from '../../../components/AdminLayout';
 import styles from './page.module.css';
 import RouteMap from './RouteMap';
+import DeleteEmployeeButton from './DeleteEmployeeButton';
 
 const s3Client = new S3Client({
   region: process.env.S3_REGION!,
@@ -95,9 +96,26 @@ export default async function EmployeeDetailPage({
   const activeTab = (resolvedSearchParams.tab as string) || defaultTab;
 
   // Helpers for Rep views
-  const today = new Date();
-  const todayVisits = employee.visits.filter(v => new Date(v.time).toDateString() === today.toDateString());
-  const todayAttendance = employee.attendances.find(a => new Date(a.date).toDateString() === today.toDateString());
+  const dateParam = typeof resolvedSearchParams.date === 'string' ? resolvedSearchParams.date : undefined;
+  const targetDate = dateParam ? new Date(dateParam) : new Date();
+  const targetDateString = targetDate.toDateString();
+
+  const prevDate = new Date(targetDate);
+  prevDate.setDate(prevDate.getDate() - 1);
+  const prevDateStr = prevDate.toISOString().split('T')[0];
+
+  const nextDate = new Date(targetDate);
+  nextDate.setDate(nextDate.getDate() + 1);
+  const nextDateStr = nextDate.toISOString().split('T')[0];
+
+  const todayVisits = employee.visits.filter(v => new Date(v.time).toDateString() === targetDateString);
+  const todayAttendance = employee.attendances.find(a => new Date(a.date).toDateString() === targetDateString);
+  
+  // For attendance tab, if no date is selected, show the first available attendance (usually latest)
+  const displayAttendance = dateParam 
+    ? todayAttendance 
+    : (employee.attendances.length > 0 ? employee.attendances[0] : undefined);
+
   const checkInStr = todayAttendance ? formatTime(todayAttendance.checkInTime) : '--:--';
   const checkOutStr = (todayAttendance && todayAttendance.checkOutTime) ? formatTime(todayAttendance.checkOutTime) : '--:--';
   
@@ -110,13 +128,20 @@ export default async function EmployeeDetailPage({
   let displayCheckOutPhotoUrl = null;
   let displayVisitPhotoUrl = null;
 
-  if (employee.attendances.length > 0) {
-    displayCheckInPhotoUrl = await getPresignedUrl(employee.attendances[0].checkInPhotoUrl);
-    displayCheckOutPhotoUrl = await getPresignedUrl(employee.attendances[0].checkOutPhotoUrl);
+  if (displayAttendance) {
+    displayCheckInPhotoUrl = await getPresignedUrl(displayAttendance.checkInPhotoUrl);
+    displayCheckOutPhotoUrl = await getPresignedUrl(displayAttendance.checkOutPhotoUrl);
   }
 
-  if (todayVisits.length > 0) {
-    displayVisitPhotoUrl = await getPresignedUrl(todayVisits[0].photoUrl);
+  // To show proof for the selected visit on the visits tab, we could also use a visitId param, 
+  // but for now we'll just show the first visit of the selected day.
+  const visitIdParam = typeof resolvedSearchParams.visitId === 'string' ? resolvedSearchParams.visitId : undefined;
+  const selectedVisit = visitIdParam 
+    ? todayVisits.find(v => v.id === visitIdParam) || todayVisits[0]
+    : todayVisits[0];
+
+  if (selectedVisit) {
+    displayVisitPhotoUrl = await getPresignedUrl(selectedVisit.photoUrl);
   }
 
   return (
@@ -157,10 +182,13 @@ export default async function EmployeeDetailPage({
             </div>
           </div>
           
-          <Link href={`/employees/${employee.id}/edit`} className="btn btn-outline" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', height: '40px', borderRadius: '8px' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-            Edit
-          </Link>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <Link href={`/employees/${employee.id}/edit`} className="btn btn-outline" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', height: '40px', borderRadius: '8px' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+              Edit
+            </Link>
+            <DeleteEmployeeButton employeeId={employee.id} />
+          </div>
         </div>
 
         {/* Tabs */}
@@ -224,9 +252,13 @@ export default async function EmployeeDetailPage({
                   <span className={styles.statPill}>{todayVisits.length} visits</span>
                 </div>
                 <div className={styles.dateSelector}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
-                  <span>{formatDate(today)}</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                  <Link href={`/employees/${employee.id}?tab=day&date=${prevDateStr}`} style={{ color: 'inherit' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                  </Link>
+                  <span>{formatDate(targetDate)}</span>
+                  <Link href={`/employees/${employee.id}?tab=day&date=${nextDateStr}`} style={{ color: 'inherit' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                  </Link>
                 </div>
               </div>
               <div className={styles.dayContent}>
@@ -272,8 +304,9 @@ export default async function EmployeeDetailPage({
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
                 <div className={styles.daysList}>
-                  {employee.attendances.length > 0 ? employee.attendances.map((att, i) => {
-                    const isToday = new Date(att.date).toDateString() === today.toDateString();
+                  {employee.attendances.length > 0 ? employee.attendances.map((att) => {
+                    const isSelected = displayAttendance && att.id === displayAttendance.id;
+                    const dateStr = new Date(att.date).toISOString().split('T')[0];
                     let durationStr = 'Incomplete';
                     if (att.checkOutTime) {
                       const ms = new Date(att.checkOutTime).getTime() - new Date(att.checkInTime).getTime();
@@ -282,10 +315,10 @@ export default async function EmployeeDetailPage({
                       durationStr = `${hrs}h ${mins}m`;
                     }
                     return (
-                      <div key={att.id} className={`${styles.dayItem} ${isToday ? styles.dayActive : ''}`}>
+                      <Link href={`/employees/${employee.id}?tab=attendance&date=${dateStr}`} key={att.id} className={`${styles.dayItem} ${isSelected ? styles.dayActive : ''}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #e2e8f0', cursor: 'pointer' }}>
                         <span>{formatDate(att.date)}</span>
                         <span className={att.checkOutTime ? styles.dayDuration : styles.dayIncomplete}>{durationStr}</span>
-                      </div>
+                      </Link>
                     );
                   }) : (
                     <div className={styles.emptyState}>No attendance records.</div>
@@ -294,13 +327,13 @@ export default async function EmployeeDetailPage({
               </div>
               
               <div className={styles.attMain}>
-                {employee.attendances.length > 0 ? (
+                {displayAttendance ? (
                   <>
                     <div className={styles.attMainHeader}>
-                      <h3>{formatDate(employee.attendances[0].date)}</h3>
+                      <h3>{formatDate(displayAttendance.date)}</h3>
                       <span className={styles.attTotalTime}>
-                        {employee.attendances[0].checkOutTime 
-                          ? `${Math.floor((new Date(employee.attendances[0].checkOutTime!).getTime() - new Date(employee.attendances[0].checkInTime).getTime()) / (1000 * 60 * 60))}h` 
+                        {displayAttendance.checkOutTime 
+                          ? `${Math.floor((new Date(displayAttendance.checkOutTime!).getTime() - new Date(displayAttendance.checkInTime).getTime()) / (1000 * 60 * 60))}h` 
                           : 'In progress'}
                       </span>
                     </div>
@@ -308,7 +341,7 @@ export default async function EmployeeDetailPage({
                       <div className={styles.proofCard}>
                         <div className={styles.proofHeader}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2c7a3f" strokeWidth="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
-                          Check in · {formatTime(employee.attendances[0].checkInTime)}
+                          Check in · {formatTime(displayAttendance.checkInTime)}
                         </div>
                         <div className={styles.photoPlaceholder}>
                           {displayCheckInPhotoUrl ? (
@@ -317,17 +350,17 @@ export default async function EmployeeDetailPage({
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a0aab0" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                           )}
                           <div className={styles.coordsOverlay}>
-                            <div className={styles.coordsLat}>{employee.attendances[0].checkInLat.toFixed(4)}, {employee.attendances[0].checkInLng.toFixed(4)}</div>
-                            <div className={styles.coordsTime}>{formatDate(employee.attendances[0].date)} · {formatTime(employee.attendances[0].checkInTime)}</div>
+                            <div className={styles.coordsLat}>{displayAttendance.checkInLat.toFixed(4)}, {displayAttendance.checkInLng.toFixed(4)}</div>
+                            <div className={styles.coordsTime}>{formatDate(displayAttendance.date)} · {formatTime(displayAttendance.checkInTime)}</div>
                           </div>
                         </div>
                       </div>
                       
-                      {employee.attendances[0].checkOutTime && (
+                      {displayAttendance.checkOutTime && (
                         <div className={styles.proofCard}>
                           <div className={styles.proofHeader}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2c7a3f" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                            Check out · {formatTime(employee.attendances[0].checkOutTime)}
+                            Check out · {formatTime(displayAttendance.checkOutTime)}
                           </div>
                           <div className={styles.photoPlaceholder}>
                             {displayCheckOutPhotoUrl ? (
@@ -336,8 +369,8 @@ export default async function EmployeeDetailPage({
                               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a0aab0" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             )}
                             <div className={styles.coordsOverlay}>
-                              <div className={styles.coordsLat}>{employee.attendances[0].checkOutLat?.toFixed(4)}, {employee.attendances[0].checkOutLng?.toFixed(4)}</div>
-                              <div className={styles.coordsTime}>{formatDate(employee.attendances[0].date)} · {formatTime(employee.attendances[0].checkOutTime)}</div>
+                              <div className={styles.coordsLat}>{displayAttendance.checkOutLat?.toFixed(4)}, {displayAttendance.checkOutLng?.toFixed(4)}</div>
+                              <div className={styles.coordsTime}>{formatDate(displayAttendance.date)} · {formatTime(displayAttendance.checkOutTime)}</div>
                             </div>
                           </div>
                         </div>
@@ -345,7 +378,7 @@ export default async function EmployeeDetailPage({
                     </div>
                   </>
                 ) : (
-                  <div className={styles.emptyState} style={{ padding: '4rem', textAlign: 'center' }}>No attendance data to display for this month.</div>
+                  <div className={styles.emptyState} style={{ padding: '4rem', textAlign: 'center' }}>No attendance data to display for this day.</div>
                 )}
               </div>
             </div>
@@ -355,28 +388,40 @@ export default async function EmployeeDetailPage({
           {!isManager && activeTab === 'visits' && (
             <div className={styles.visitsTabFull}>
               <div className={styles.vListSidebar}>
-                <div className={styles.vListHeader}>{formatDate(today)} · {todayVisits.length} visits</div>
+                <div className={styles.dateSelector} style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>
+                  <Link href={`/employees/${employee.id}?tab=visits&date=${prevDateStr}`} style={{ color: 'inherit' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                  </Link>
+                  <span>{formatDate(targetDate)} · {todayVisits.length} visits</span>
+                  <Link href={`/employees/${employee.id}?tab=visits&date=${nextDateStr}`} style={{ color: 'inherit' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                  </Link>
+                </div>
                 
-                {todayVisits.length > 0 ? todayVisits.map((v, i) => (
-                  <div key={v.id} className={`${styles.vListItem} ${i === 0 ? styles.vListItemActive : ''}`}>
-                    <div className={styles.vListIcon}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a0aab0" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    </div>
-                    <div className={styles.vListInfo}>
-                      <div className={styles.vListName}>{v.vendorName || 'Unknown'}</div>
-                      <div className={styles.vListTime}>{formatTime(v.time)} · {v.area || 'Unknown'}</div>
-                    </div>
-                    <div className={v.outcome === 'ORDER_PLACED' ? styles.vListOutcomeOrder : styles.vListOutcomeMet}>
-                      {v.outcome === 'ORDER_PLACED' ? 'Order' : v.outcome === 'MET' ? 'Met' : 'N/A'}
-                    </div>
-                  </div>
-                )) : (
+                {todayVisits.length > 0 ? todayVisits.map((v, i) => {
+                  const isSelectedVisit = selectedVisit && v.id === selectedVisit.id;
+                  const dateStr = new Date(v.time).toISOString().split('T')[0];
+                  return (
+                    <Link href={`/employees/${employee.id}?tab=visits&date=${dateStr}&visitId=${v.id}`} key={v.id} className={`${styles.vListItem} ${isSelectedVisit ? styles.vListItemActive : ''}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex' }}>
+                      <div className={styles.vListIcon}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a0aab0" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      </div>
+                      <div className={styles.vListInfo}>
+                        <div className={styles.vListName}>{v.vendorName || 'Unknown'}</div>
+                        <div className={styles.vListTime}>{formatTime(v.time)} · {v.area || 'Unknown'}</div>
+                      </div>
+                      <div className={v.outcome === 'ORDER_PLACED' ? styles.vListOutcomeOrder : styles.vListOutcomeMet}>
+                        {v.outcome === 'ORDER_PLACED' ? 'Order' : v.outcome === 'MET' ? 'Met' : 'N/A'}
+                      </div>
+                    </Link>
+                  );
+                }) : (
                   <div className={styles.emptyState} style={{ padding: '2rem' }}>No visits recorded today.</div>
                 )}
               </div>
               
               <div className={styles.vDetailsMain}>
-                {todayVisits.length > 0 ? (
+                {selectedVisit ? (
                   <>
                     <div className={styles.vPhotoLarge}>
                       {displayVisitPhotoUrl ? (
@@ -385,26 +430,26 @@ export default async function EmployeeDetailPage({
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a0aab0" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                       )}
                       <div className={styles.coordsOverlay}>
-                        <div className={styles.coordsLat}>{todayVisits[0].lat.toFixed(4)}, {todayVisits[0].lng.toFixed(4)}</div>
-                        <div className={styles.coordsTime}>{formatDate(todayVisits[0].time)} · {formatTime(todayVisits[0].time)}</div>
+                        <div className={styles.coordsLat}>{selectedVisit.lat.toFixed(4)}, {selectedVisit.lng.toFixed(4)}</div>
+                        <div className={styles.coordsTime}>{formatDate(selectedVisit.time)} · {formatTime(selectedVisit.time)}</div>
                       </div>
                     </div>
                     <div className={styles.vMeta}>
-                      <h2>{todayVisits[0].vendorName || 'Unknown Vendor'}</h2>
+                      <h2>{selectedVisit.vendorName || 'Unknown Vendor'}</h2>
                       <div className={styles.vMetaRow}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        {formatTime(todayVisits[0].time)}
+                        {formatTime(selectedVisit.time)}
                       </div>
                       <div className={styles.vMetaRow}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
-                        Area: {todayVisits[0].area || 'Unknown Area'}
+                        Area: {selectedVisit.area || 'Unknown Area'}
                       </div>
                       <div className={styles.vMetaRow}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        {todayVisits[0].lat.toFixed(4)}, {todayVisits[0].lng.toFixed(4)}
+                        {selectedVisit.lat.toFixed(4)}, {selectedVisit.lng.toFixed(4)}
                       </div>
                       <div className={styles.badgeOutcomeLargeOrder}>
-                        {todayVisits[0].outcome === 'ORDER_PLACED' ? 'Order placed' : todayVisits[0].outcome === 'MET' ? 'Met successfully' : 'Not available'}
+                        {selectedVisit.outcome === 'ORDER_PLACED' ? 'Order placed' : selectedVisit.outcome === 'MET' ? 'Met successfully' : 'Not available'}
                       </div>
                     </div>
                   </>

@@ -96,14 +96,17 @@ export const ProfileScreen = () => {
         <View style={styles.listContainer}>
           <ListItem 
             title="My attendance" 
-            rightText="22 days" 
             onPress={() => navigation.navigate('MyAttendance')} 
           />
           <View style={styles.divider} />
           <ListItem 
             title="My visits" 
-            rightText="148" 
             onPress={() => navigation.navigate('MyVisits')} 
+          />
+          <View style={styles.divider} />
+          <ListItem 
+            title="My leaves" 
+            onPress={() => navigation.navigate('LeaveHistory')} 
           />
         </View>
 

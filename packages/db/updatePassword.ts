@@ -2,9 +2,9 @@ import { prisma } from './src/index';
 import bcrypt from 'bcryptjs';
 
 async function updatePassword() {
-  const passwordHash = await bcrypt.hash('password123', 10);
+  const passwordHash = await bcrypt.hash('safegrow@2026', 10);
   await prisma.user.update({
-    where: { userId: 'siya.goyal' },
+    where: { email: 'safegrowapp@gmail.com' },
     data: { passwordHash }
   });
   console.log("Password updated!");

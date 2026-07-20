@@ -8,8 +8,8 @@ import { theme } from '../../../config/theme';
 
 export const VisitCameraScreen = () => {
   const navigation = useNavigation<any>();
-  // Use the rear camera for visits
-  const device = useCameraDevice('back');
+  const [useFrontCamera, setUseFrontCamera] = useState(false);
+  const device = useCameraDevice(useFrontCamera ? 'front' : 'back');
 
   const { hasPermission: hasCameraPermission, requestPermission: requestCameraPermission } = useCameraPermission();
   const camera = useRef<Camera>(null);
@@ -98,6 +98,13 @@ export const VisitCameraScreen = () => {
         <TouchableOpacity style={styles.captureButtonOuter} onPress={handleCapture}>
           <View style={styles.captureButtonInner} />
         </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.switchCameraButton} 
+          onPress={() => setUseFrontCamera(!useFrontCamera)}
+        >
+          <Text style={styles.switchCameraText}>↺</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -167,5 +174,19 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     backgroundColor: theme.colors.surface,
+  },
+  switchCameraButton: {
+    position: 'absolute',
+    right: 40,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  switchCameraText: {
+    fontSize: 24,
+    color: theme.colors.surface,
   },
 });

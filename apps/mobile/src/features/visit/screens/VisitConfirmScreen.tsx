@@ -21,7 +21,8 @@ export const VisitConfirmScreen = () => {
   const { attendanceId } = useSelector((state: RootState) => state.attendance);
   
   const [selectedOutcome, setSelectedOutcome] = useState<string>('');
-  const [vendorName, setVendorName] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [area, setArea] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,8 +32,13 @@ export const VisitConfirmScreen = () => {
       return;
     }
 
-    if (!vendorName.trim() || !area.trim()) {
-      Alert.alert('Validation Error', 'Please enter both Vendor Name and Area.');
+    if (!clientName.trim() || !area.trim()) {
+      Alert.alert('Validation Error', 'Please enter both Client Name and Area.');
+      return;
+    }
+    
+    if (phoneNumber.length !== 10) {
+      Alert.alert('Validation Error', 'Please enter a valid 10-digit phone number.');
       return;
     }
     
@@ -71,7 +77,8 @@ export const VisitConfirmScreen = () => {
         lat: location?.lat || 0,
         lng: location?.lng || 0,
         photoUrl: publicUrl,
-        vendorName: vendorName.trim(),
+        vendorName: clientName.trim(),
+        phoneNumber,
         area: area.trim(),
         outcome: selectedOutcome.toUpperCase().replace(' ', '_'),
       });
@@ -142,10 +149,26 @@ export const VisitConfirmScreen = () => {
 
           <View style={{ marginBottom: theme.spacing.md }}>
             <Input
-              label="Vendor Name *"
-              placeholder="Enter vendor name"
-              value={vendorName}
-              onChangeText={setVendorName}
+              label="Client Name *"
+              placeholder="Enter client name"
+              value={clientName}
+              onChangeText={setClientName}
+            />
+          </View>
+
+          <View style={{ marginBottom: theme.spacing.md }}>
+            <Input
+              label="Phone Number *"
+              placeholder="Enter 10-digit phone number"
+              value={phoneNumber}
+              onChangeText={(text) => {
+                const numericValue = text.replace(/[^0-9]/g, '');
+                if (numericValue.length <= 10) {
+                  setPhoneNumber(numericValue);
+                }
+              }}
+              keyboardType="phone-pad"
+              maxLength={10}
             />
           </View>
           
@@ -166,7 +189,7 @@ export const VisitConfirmScreen = () => {
           title="Save visit" 
           onPress={handleSave} 
           loading={loading}
-          disabled={!selectedOutcome || !vendorName.trim() || !area.trim()}
+          disabled={!selectedOutcome || !clientName.trim() || !area.trim() || phoneNumber.length !== 10}
         />
       </View>
     </KeyboardAvoidingView>

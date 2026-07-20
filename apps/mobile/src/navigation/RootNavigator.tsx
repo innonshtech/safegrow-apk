@@ -26,6 +26,8 @@ import { MyVisitsScreen } from '../features/profile/screens/MyVisitsScreen';
 import { NotificationsScreen } from '../features/profile/screens/NotificationsScreen';
 import { ChangePasswordScreen } from '../features/profile/screens/ChangePasswordScreen';
 import { LocationTrackingScreen } from '../features/profile/screens/LocationTrackingScreen';
+import { LeaveHistoryScreen } from '../features/leaves/screens/LeaveHistoryScreen';
+import { LeaveApplicationScreen } from '../features/leaves/screens/LeaveApplicationScreen';
 
 import { MyTeamScreen } from '../features/team/screens/MyTeamScreen';
 import { TeamMemberDayScreen } from '../features/team/screens/TeamMemberDayScreen';
@@ -135,6 +137,8 @@ export const RootNavigator = () => {
             <Stack.Screen name="Notifications" component={NotificationsScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
             <Stack.Screen name="LocationTracking" component={LocationTrackingScreen} />
+            <Stack.Screen name="LeaveHistory" component={LeaveHistoryScreen} />
+            <Stack.Screen name="LeaveApplication" component={LeaveApplicationScreen} />
             
             <Stack.Screen name="TeamMemberDay" component={TeamMemberDayScreen} />
             <Stack.Screen name="TeamMemberVisitDetail" component={TeamMemberVisitDetailScreen} />

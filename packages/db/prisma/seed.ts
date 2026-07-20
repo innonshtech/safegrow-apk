@@ -5,16 +5,16 @@ import bcrypt from 'bcryptjs';
 async function main() {
   console.log('Start seeding...');
   
-  const passwordHash = await bcrypt.hash('password123', 10);
+  const passwordHash = await bcrypt.hash('safegrow@2026', 10);
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@safegrow.com' },
+    where: { email: 'safegrowapp@gmail.com' },
     update: {
       name: 'System Admin' // Changed from Ramesh Kale to a generic name
     },
     create: {
       userId: 'admin',
-      email: 'admin@safegrow.com',
+      email: 'safegrowapp@gmail.com',
       passwordHash,
       name: 'System Admin',
       role: 'ADMIN',

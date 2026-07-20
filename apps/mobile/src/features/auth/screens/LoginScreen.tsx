@@ -62,7 +62,7 @@ export const LoginScreen = () => {
       <View style={styles.content}>
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <Image source={require('../../../assets/logo.png')} style={styles.logoImage} resizeMode="contain" />
+          <Image source={require('../../../assets/Safegrow_logo.png')} style={styles.logoImage} resizeMode="contain" />
         </View>
 
         <Text style={styles.subtitle}>Field sales · log in to continue</Text>

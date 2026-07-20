@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 // We use `jose` for edge middleware JWT verification because jsonwebtoken is Node-only
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   const isPublicPath = path === '/login' || path === '/forgot-password';

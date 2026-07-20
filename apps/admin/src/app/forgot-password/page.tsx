@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logoContainer}>
-            <Image src="/logo 1.svg" alt="SafeGrow Logo" width={120} height={150} style={{ objectFit: 'contain' }} priority />
+            <Image src="/Safegrow_Logo.png" alt="SafeGrow Logo" width={120} height={150} style={{ objectFit: 'contain' }} priority />
           </div>
           <p className={styles.subtitle}>
             {currentState.step === 1 && "Reset your password"}
@@ -50,13 +50,13 @@ export default function ForgotPasswordPage() {
         {currentState.step === 1 && (
           <form className={styles.form} action={formAction1}>
             <div className={styles.inputGroup}>
-              <label className="label" htmlFor="email">Email or User ID</label>
+              <label className="label" htmlFor="email">Email address</label>
               <input 
-                type="text" 
+                type="email" 
                 name="email"
                 id="email" 
                 className="input" 
-                placeholder="admin@safegrow.com" 
+                placeholder="safegrowapp@gmail.com" 
                 required
               />
             </div>

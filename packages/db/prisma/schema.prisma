@@ -31,6 +31,18 @@ enum RequestStatus {
   REJECTED
 }
 
+enum LeaveType {
+  CASUAL
+  PRIVILEGE
+  MEDICAL
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id           String     @id @default(uuid())
   userId       String     @unique // Custom ID for login
@@ -66,6 +78,7 @@ model User {
   alerts         FraudAlert[]   @relation("FraudAlertsTriggered")
   resolvedAlerts FraudAlert[]   @relation("FraudAlertsResolved")
   attendanceRequests AttendanceRequest[]
+  leaveRequests  LeaveRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -108,6 +121,26 @@ model AttendanceRequest {
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model LeaveRequest {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  
+  startDate DateTime    @db.Date
+  endDate   DateTime    @db.Date
+  type      LeaveType
+  reason    String
+  
+  totalDays  Int
+  paidDays   Int
+  unpaidDays Int
+  
+  status    LeaveStatus @default(PENDING)
+  
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 model Visit {

@@ -22,8 +22,7 @@
 .logoIcon {
   width: 32px;
   height: 32px;
-  background-color: var(--primary);
-  color: white;
+  background-color: transparent;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;

@@ -43,9 +43,7 @@ function AdminLayoutContent({ children, navItems, pathname }: any) {
       <div className={styles.mobileHeader}>
         <div className={styles.logoContainer} style={{ display: 'flex', padding: 0 }}>
           <div className={styles.logoIcon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM11 19.93C7.05 19.43 4 16.05 4 12C4 7.95 7.05 4.57 11 4.07V19.93ZM13 4.07C16.95 4.57 20 7.95 20 12C20 16.05 16.95 19.43 13 19.93V4.07Z" fill="currentColor"/>
-            </svg>
+            <img src="/Safegrow_logo.png" alt="SafeGrow Logo" width={32} height={32} />
           </div>
           <span className={styles.logoText}>SafeGrow</span>
         </div>
@@ -60,10 +58,7 @@ function AdminLayoutContent({ children, navItems, pathname }: any) {
       <aside className={styles.sidebar}>
         <div className={styles.logoContainer}>
           <div className={styles.logoIcon}>
-            {/* Mock leaf icon */}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM11 19.93C7.05 19.43 4 16.05 4 12C4 7.95 7.05 4.57 11 4.07V19.93ZM13 4.07C16.95 4.57 20 7.95 20 12C20 16.05 16.95 19.43 13 19.93V4.07Z" fill="currentColor"/>
-            </svg>
+            <img src="/Safegrow_logo.png" alt="SafeGrow Logo" width={32} height={32} style={{ objectFit: 'contain' }} />
           </div>
           <span className={styles.logoText}>SafeGrow</span>
         </div>

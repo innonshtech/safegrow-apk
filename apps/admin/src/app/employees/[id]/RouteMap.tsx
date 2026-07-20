@@ -32,14 +32,29 @@ export default function RouteMap({
     googleMapsApiKey: apiKey
   });
 
-  const path = useMemo(() => pings.map(p => ({ lat: p.lat, lng: p.lng })), [pings]);
+  const path = useMemo(() => {
+    if (pings.length > 0) {
+      return pings.map(p => ({ lat: p.lat, lng: p.lng }));
+    }
+    
+    // Fallback: connect checkIn, visits, and checkOut if no pings
+    const fallbackPath: LocationPoint[] = [];
+    if (checkInLocation) fallbackPath.push(checkInLocation);
+    
+    // Sort visits by time to connect them in order
+    const sortedVisits = [...visits].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    sortedVisits.forEach(v => fallbackPath.push({ lat: v.lat, lng: v.lng }));
+    
+    if (checkOutLocation) fallbackPath.push(checkOutLocation);
+    
+    return fallbackPath;
+  }, [pings, visits, checkInLocation, checkOutLocation]);
   
   const center = useMemo(() => {
     if (path.length > 0) return path[Math.floor(path.length / 2)];
-    if (visits.length > 0) return { lat: visits[0].lat, lng: visits[0].lng };
     if (checkInLocation) return { lat: checkInLocation.lat, lng: checkInLocation.lng };
     return { lat: 18.5204, lng: 73.8567 }; // Default Pune
-  }, [path, visits, checkInLocation]);
+  }, [path, checkInLocation]);
 
   return isLoaded ? (
     <GoogleMap
