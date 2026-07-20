@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@safegrow/db";
-import { verifyAuth } from "../../../../../lib/auth";
-import { withErrorHandler } from "../../../../../lib/apiHandler";
-import { UnauthorizedError, AppError } from "../../../../../lib/errors";
+import { getCurrentAdmin } from "../../../../../../lib/auth";
+import { withErrorHandler } from "../../../../../../lib/apiHandler";
+import { UnauthorizedError, AppError } from "../../../../../../lib/errors";
 
 export const POST = withErrorHandler(async (request: Request) => {
-  const auth = verifyAuth(request);
+  const auth = await getCurrentAdmin();
   if (!auth || auth.role !== "ADMIN") {
     throw new UnauthorizedError();
   }
