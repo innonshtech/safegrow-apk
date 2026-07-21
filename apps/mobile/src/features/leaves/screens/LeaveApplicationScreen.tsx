@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform, Modal } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../config/theme';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -12,13 +12,15 @@ const LEAVE_TYPES = ['CASUAL', 'PRIVILEGE', 'MEDICAL'];
 
 export const LeaveApplicationScreen = () => {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  const editLeave = route.params?.editLeave;
   
-  const [type, setType] = useState('CASUAL');
-  const [reason, setReason] = useState('');
+  const [type, setType] = useState(editLeave?.type || 'CASUAL');
+  const [reason, setReason] = useState(editLeave?.reason || '');
   const [loading, setLoading] = useState(false);
   
-  const [startDateStr, setStartDateStr] = useState('');
-  const [endDateStr, setEndDateStr] = useState('');
+  const [startDateStr, setStartDateStr] = useState(editLeave ? editLeave.startDate.split('T')[0] : '');
+  const [endDateStr, setEndDateStr] = useState(editLeave ? editLeave.endDate.split('T')[0] : '');
   const [balance, setBalance] = useState<any>(null);
   const [showCalendar, setShowCalendar] = useState<'start' | 'end' | null>(null);
 
@@ -82,13 +84,23 @@ export const LeaveApplicationScreen = () => {
 
     try {
       setLoading(true);
-      await apiClient.post('/leaves', {
-        startDate: start.toISOString(),
-        endDate: end.toISOString(),
-        type,
-        reason: reason.trim()
-      });
-      globalToast.show({ message: 'Leave requested successfully!', type: 'success' });
+      if (editLeave) {
+        await apiClient.put(`/leaves/${editLeave.id}`, {
+          startDate: start.toISOString(),
+          endDate: end.toISOString(),
+          type,
+          reason: reason.trim()
+        });
+        globalToast.show({ message: 'Leave updated successfully!', type: 'success' });
+      } else {
+        await apiClient.post('/leaves', {
+          startDate: start.toISOString(),
+          endDate: end.toISOString(),
+          type,
+          reason: reason.trim()
+        });
+        globalToast.show({ message: 'Leave requested successfully!', type: 'success' });
+      }
       navigation.goBack();
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || 'Failed to submit leave request';
@@ -104,7 +116,7 @@ export const LeaveApplicationScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backButton}>‹</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Apply for Leave</Text>
+        <Text style={styles.headerTitle}>{editLeave ? "Edit Leave Request" : "Apply for Leave"}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -187,7 +199,7 @@ export const LeaveApplicationScreen = () => {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button title="Submit Request" onPress={handleApply} loading={loading} />
+        <Button title={editLeave ? "Update Request" : "Submit Request"} onPress={handleApply} loading={loading} />
       </View>
     </KeyboardAvoidingView>
   );

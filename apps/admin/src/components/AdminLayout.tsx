@@ -43,7 +43,7 @@ function AdminLayoutContent({ children, navItems, pathname }: any) {
       <div className={styles.mobileHeader}>
         <div className={styles.logoContainer} style={{ display: 'flex', padding: 0 }}>
           <div className={styles.logoIcon}>
-            <img src="/Safegrow_logo.png" alt="SafeGrow Logo" width={32} height={32} />
+            <img src="/Safegrow_Logo.png" alt="SafeGrow Logo" width={32} height={32} />
           </div>
           <span className={styles.logoText}>SafeGrow</span>
         </div>
@@ -58,7 +58,7 @@ function AdminLayoutContent({ children, navItems, pathname }: any) {
       <aside className={styles.sidebar}>
         <div className={styles.logoContainer}>
           <div className={styles.logoIcon}>
-            <img src="/Safegrow_logo.png" alt="SafeGrow Logo" width={32} height={32} style={{ objectFit: 'contain' }} />
+            <img src="/Safegrow_Logo.png" alt="SafeGrow Logo" width={32} height={32} style={{ objectFit: 'contain' }} />
           </div>
           <span className={styles.logoText}>SafeGrow</span>
         </div>

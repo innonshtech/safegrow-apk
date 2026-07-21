@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
+import { useToast } from '@/components/Toast/ToastContext';
 
 export default function SettingsClient({ admin, initialSettings }: { admin: any, initialSettings: any }) {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'account' | 'company' | 'leaves' | 'hours' | 'notifications' | 'export'>('account');
   const [settings, setSettings] = useState(initialSettings);
   const [loading, setLoading] = useState(false);
@@ -18,12 +20,12 @@ export default function SettingsClient({ admin, initialSettings }: { admin: any,
       });
       const data = await res.json();
       if (data.success) {
-        alert("Settings saved successfully.");
+        showToast("Settings saved successfully.", "success");
       } else {
-        alert(data.error || "Failed to save settings.");
+        showToast(data.error || "Failed to save settings.", "error");
       }
     } catch (err) {
-      alert("Network error.");
+      showToast("Network error.", "error");
     } finally {
       setLoading(false);
     }

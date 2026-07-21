@@ -44,6 +44,19 @@ export const POST = withErrorHandler(async (request: Request) => {
     throw new AppError("End date must be after start date", 400);
   }
 
+  const overlappingLeave = await prisma.leaveRequest.findFirst({
+    where: {
+      userId,
+      status: { in: ['APPROVED', 'PENDING'] },
+      startDate: { lte: end },
+      endDate: { gte: start }
+    }
+  });
+
+  if (overlappingLeave) {
+    throw new AppError("You already have a pending or approved leave request during these dates.", 400);
+  }
+
   // Calculate total days excluding Sundays
   let totalDays = 0;
   let currentDate = new Date(start);

@@ -32,9 +32,11 @@ export const GET = withErrorHandler(async (request: Request) => {
     });
 
   } else if (type === 'attendance') {
-    // Need to join Attendance and AttendanceRequests? 
-    // Usually export just the raw Attendance table
+    const employeeId = searchParams.get('employeeId');
+    const whereClause = employeeId ? { userId: employeeId } : {};
+
     const attendances = await prisma.attendance.findMany({
+      where: whereClause,
       include: { user: { select: { name: true, employeeId: true } } },
       orderBy: { date: 'desc' }
     });

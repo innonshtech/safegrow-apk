@@ -1,28 +1,63 @@
 import { NextResponse } from "next/server";
 import { CreateLeaveRequestSchema } from "@safegrow/shared";
 import { prisma } from "@safegrow/db";
-import { verifyAuth } from "../../../../lib/auth";
-import { withErrorHandler } from "../../../../lib/apiHandler";
-import { UnauthorizedError, AppError } from "../../../../lib/errors";
+import { verifyAuth } from "../../../../../lib/auth";
+import { withErrorHandler } from "../../../../../lib/apiHandler";
+import { UnauthorizedError, AppError } from "../../../../../lib/errors";
 
-export const GET = withErrorHandler(async (request: Request) => {
+export const DELETE = withErrorHandler(async (request: Request, { params }: { params: { id: string } }) => {
   const auth = verifyAuth(request);
   if (!auth) {
     throw new UnauthorizedError();
   }
 
-  const leaves = await prisma.leaveRequest.findMany({
-    where: { userId: auth.id },
-    orderBy: { createdAt: 'desc' }
+  const { id } = params;
+
+  const leave = await prisma.leaveRequest.findUnique({
+    where: { id },
   });
 
-  return NextResponse.json({ leaves });
+  if (!leave) {
+    throw new AppError("Leave request not found", 404);
+  }
+
+  if (leave.userId !== auth.id && auth.role !== 'ADMIN') {
+    throw new AppError("Unauthorized to delete this leave request", 403);
+  }
+
+  if (leave.status !== 'PENDING') {
+    throw new AppError("Only pending leave requests can be deleted", 400);
+  }
+
+  await prisma.leaveRequest.delete({
+    where: { id },
+  });
+
+  return NextResponse.json({ message: "Leave request deleted successfully" });
 });
 
-export const POST = withErrorHandler(async (request: Request) => {
+export const PUT = withErrorHandler(async (request: Request, { params }: { params: { id: string } }) => {
   const auth = verifyAuth(request);
   if (!auth) {
     throw new UnauthorizedError();
+  }
+
+  const { id } = params;
+
+  const leave = await prisma.leaveRequest.findUnique({
+    where: { id },
+  });
+
+  if (!leave) {
+    throw new AppError("Leave request not found", 404);
+  }
+
+  if (leave.userId !== auth.id && auth.role !== 'ADMIN') {
+    throw new AppError("Unauthorized to update this leave request", 403);
+  }
+
+  if (leave.status !== 'PENDING' && auth.role !== 'ADMIN') {
+    throw new AppError("Only pending leave requests can be modified", 400);
   }
 
   const body = await request.json();
@@ -30,12 +65,11 @@ export const POST = withErrorHandler(async (request: Request) => {
 
   const { startDate, endDate, type, reason, isAdminOverride, targetUserId } = result;
 
-  // Check admin privileges if overriding
   if (isAdminOverride && auth.role !== 'ADMIN') {
     throw new AppError("Only admins can override leave quotas", 403);
   }
 
-  const userId = isAdminOverride && targetUserId ? targetUserId : auth.id;
+  const userId = isAdminOverride && targetUserId ? targetUserId : leave.userId;
 
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -47,6 +81,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const overlappingLeave = await prisma.leaveRequest.findFirst({
     where: {
       userId,
+      id: { not: id }, // Exclude current leave
       status: { in: ['APPROVED', 'PENDING'] },
       startDate: { lte: end },
       endDate: { gte: start }
@@ -61,7 +96,6 @@ export const POST = withErrorHandler(async (request: Request) => {
   let totalDays = 0;
   let currentDate = new Date(start);
   while (currentDate <= end) {
-    // 0 is Sunday
     if (currentDate.getDay() !== 0) {
       totalDays++;
     }
@@ -83,7 +117,8 @@ export const POST = withErrorHandler(async (request: Request) => {
     where: {
       userId,
       type,
-      status: { in: ['APPROVED', 'PENDING'] }, // Count pending as well
+      id: { not: id }, // Exclude current leave
+      status: { in: ['APPROVED', 'PENDING'] },
       startDate: {
         gte: startOfYear,
         lte: endOfYear
@@ -91,7 +126,6 @@ export const POST = withErrorHandler(async (request: Request) => {
     }
   });
 
-  // Fetch dynamic quotas
   const settings = await prisma.setting.findMany({
     where: {
       key: {
@@ -115,7 +149,6 @@ export const POST = withErrorHandler(async (request: Request) => {
     if (!isAdminOverride && casualUsed + totalDays > limitCasual) {
       throw new AppError(`Yearly casual leave quota exceeded (${limitCasual}). You have already used ${casualUsed} days.`, 400);
     }
-    // Casual leaves are always unpaid
     paidDays = 0;
     unpaidDays = totalDays;
   } else if (type === 'PRIVILEGE') {
@@ -123,7 +156,6 @@ export const POST = withErrorHandler(async (request: Request) => {
     if (!isAdminOverride && privilegeUsed + totalDays > limitPrivilege) {
       throw new AppError(`Yearly privilege leave quota exceeded (${limitPrivilege}). You have already used ${privilegeUsed} days.`, 400);
     }
-    // Privilege leaves are always unpaid
     paidDays = 0;
     unpaidDays = totalDays;
   } else if (type === 'MEDICAL') {
@@ -137,16 +169,15 @@ export const POST = withErrorHandler(async (request: Request) => {
     const remainingYearly = Math.max(0, limitMedicalYearly - medicalUsedYear);
     const remainingMonthly = Math.max(0, limitMedicalMonthly - medicalUsedMonth);
     
-    // We can only pay for what remains in both yearly and monthly quotas
     const availablePaidDays = Math.min(remainingYearly, remainingMonthly);
     
     paidDays = Math.min(totalDays, availablePaidDays);
     unpaidDays = totalDays - paidDays;
   }
 
-  const leaveRequest = await prisma.leaveRequest.create({
+  const updatedLeave = await prisma.leaveRequest.update({
+    where: { id },
     data: {
-      userId,
       startDate: start,
       endDate: end,
       type,
@@ -154,9 +185,8 @@ export const POST = withErrorHandler(async (request: Request) => {
       totalDays,
       paidDays,
       unpaidDays,
-      status: isAdminOverride ? 'APPROVED' : 'PENDING' // Auto-approve if admin bypass
     }
   });
 
-  return NextResponse.json({ message: "Leave request created successfully", leaveRequest });
+  return NextResponse.json({ message: "Leave request updated successfully", leaveRequest: updatedLeave });
 });

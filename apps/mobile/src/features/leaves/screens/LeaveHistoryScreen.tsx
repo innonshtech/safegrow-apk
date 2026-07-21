@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Alert } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { theme } from '../../../config/theme';
 import { apiClient } from '../../../api/client';
@@ -32,13 +32,54 @@ export const LeaveHistoryScreen = () => {
     }
   }, [isFocused]);
 
+  const handleDelete = (id: string) => {
+    Alert.alert(
+      "Delete Leave",
+      "Are you sure you want to delete this leave request?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await apiClient.delete(`/leaves/${id}`);
+              fetchLeaves();
+            } catch (error) {
+              console.error(error);
+              Alert.alert("Error", "Failed to delete leave request");
+              setLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleEdit = (item: any) => {
+    navigation.navigate('LeaveApplication', { editLeave: item });
+  };
+
   const renderItem = ({ item }: { item: any }) => {
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.typeText}>{item.type}</Text>
-          <View style={[styles.statusBadge, styles[`status_${item.status}` as keyof typeof styles]]}>
-            <Text style={[styles.statusText, styles[`statusText_${item.status}` as keyof typeof styles]]}>{item.status}</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
+            {item.status === 'PENDING' && (
+              <>
+                <TouchableOpacity onPress={() => handleEdit(item)}>
+                  <Text style={{color: theme.colors.primary, fontFamily: theme.fonts.medium, fontSize: 13}}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                  <Text style={{color: theme.colors.error, fontFamily: theme.fonts.medium, fontSize: 13}}>Delete</Text>
+                </TouchableOpacity>
+              </>
+            )}
+            <View style={[styles.statusBadge, styles[`status_${item.status}` as keyof typeof styles]]}>
+              <Text style={[styles.statusText, styles[`statusText_${item.status}` as keyof typeof styles]]}>{item.status}</Text>
+            </View>
           </View>
         </View>
         <Text style={styles.dateText}>
