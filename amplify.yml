@@ -11,9 +11,11 @@ applications:
           commands:
             - pnpm --filter @safegrow/db generate
             - pnpm run build
-            - mkdir -p .next/standalone/node_modules
-            - cp -rL ../../node_modules/@prisma .next/standalone/node_modules/ || true
-            - cp -rL ../../node_modules/.prisma .next/standalone/node_modules/ || true
+            - mkdir -p node_modules
+            - cp -rL ../../node_modules/@prisma ./node_modules/ || true
+            - cp -rL ../../node_modules/.prisma ./node_modules/ || true
+            - cp -rL ../../node_modules/@aws-sdk ./node_modules/ || true
+            - cp -rL ../../node_modules/bcrypt ./node_modules/ || true
       artifacts:
         baseDirectory: .next
         files:
@@ -35,9 +37,11 @@ applications:
           commands:
             - pnpm --filter @safegrow/db generate
             - pnpm run build
-            - mkdir -p .next/standalone/node_modules
-            - cp -rL ../../node_modules/@prisma .next/standalone/node_modules/ || true
-            - cp -rL ../../node_modules/.prisma .next/standalone/node_modules/ || true
+            - mkdir -p node_modules
+            - cp -rL ../../node_modules/@prisma ./node_modules/ || true
+            - cp -rL ../../node_modules/.prisma ./node_modules/ || true
+            - cp -rL ../../node_modules/@aws-sdk ./node_modules/ || true
+            - cp -rL ../../node_modules/bcrypt ./node_modules/ || true
       artifacts:
         baseDirectory: .next
         files:
