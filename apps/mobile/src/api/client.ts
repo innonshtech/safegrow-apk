@@ -5,8 +5,8 @@ import { store } from '../store';
 import { logout } from '../features/auth/store/authSlice';
 import { globalToast } from '../components/ui/ToastProvider';
 
-// Use Amplify API as default fallback
-const baseURL = Config.API_URL || 'https://main.dsdfc7hjrjp5f.amplifyapp.com/api/v1';
+// Use Vercel API which natively supports Prisma monorepo deployments
+const baseURL = Config.API_URL || 'https://safegrow-apk-admin.vercel.app/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
