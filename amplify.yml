@@ -12,8 +12,8 @@ applications:
             - pnpm --filter @safegrow/db generate
             - pnpm run build
             - mkdir -p .next/standalone/node_modules
-            - cp -r ../../node_modules/@prisma .next/standalone/node_modules/ || true
-            - cp -r ../../node_modules/.prisma .next/standalone/node_modules/ || true
+            - cp -rL ../../node_modules/@prisma .next/standalone/node_modules/ || true
+            - cp -rL ../../node_modules/.prisma .next/standalone/node_modules/ || true
       artifacts:
         baseDirectory: .next
         files:
@@ -36,8 +36,8 @@ applications:
             - pnpm --filter @safegrow/db generate
             - pnpm run build
             - mkdir -p .next/standalone/node_modules
-            - cp -r ../../node_modules/@prisma .next/standalone/node_modules/ || true
-            - cp -r ../../node_modules/.prisma .next/standalone/node_modules/ || true
+            - cp -rL ../../node_modules/@prisma .next/standalone/node_modules/ || true
+            - cp -rL ../../node_modules/.prisma .next/standalone/node_modules/ || true
       artifacts:
         baseDirectory: .next
         files:
