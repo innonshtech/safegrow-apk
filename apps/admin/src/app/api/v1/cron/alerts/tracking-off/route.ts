@@ -9,12 +9,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    const { startOfDayUTC, endOfDayUTC } = getISTDayBoundaries();
+    const { startOfDayUTC, endOfDayUTC, targetDate } = getISTDayBoundaries();
 
     // Get all attendances today where checkout is null
     const attendances = await prisma.attendance.findMany({
       where: {
-        date: { gte: startOfDayUTC, lt: endOfDayUTC },
+        date: targetDate,
         checkOutTime: null,
       },
       include: {

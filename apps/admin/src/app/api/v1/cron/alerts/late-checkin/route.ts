@@ -18,15 +18,12 @@ export async function GET(request: Request) {
     const [stdHour, stdMinute] = standardTimeStr.split(':').map(Number);
 
     // 2. Get today's start and end date in IST
-    const { startOfDayUTC, endOfDayUTC, year, month, day } = getISTDayBoundaries();
+    const { startOfDayUTC, endOfDayUTC, targetDate, year, month, day } = getISTDayBoundaries();
 
     // 3. Fetch all attendances for today
     const attendances = await prisma.attendance.findMany({
       where: {
-        date: {
-          gte: startOfDayUTC,
-          lt: endOfDayUTC,
-        }
+        date: targetDate
       },
       include: {
         user: true,

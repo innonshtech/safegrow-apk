@@ -18,5 +18,8 @@ export function getISTDayBoundaries() {
   const startOfDayUTC = new Date(Date.UTC(year, month, day, 0, 0, 0) - (5.5 * 60 * 60 * 1000));
   const endOfDayUTC = new Date(Date.UTC(year, month, day, 23, 59, 59, 999) - (5.5 * 60 * 60 * 1000));
   
-  return { startOfDayUTC, endOfDayUTC, year, month, day };
+  // For @db.Date fields, Prisma expects the exact UTC Date of that day
+  const targetDate = new Date(Date.UTC(year, month, day));
+  
+  return { startOfDayUTC, endOfDayUTC, targetDate, year, month, day };
 }

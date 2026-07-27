@@ -10,11 +10,11 @@ export async function GET(request: Request) {
 
   try {
     // 1. Get today's start and end date in IST (since this runs at 11:55 PM IST)
-    const { startOfDayUTC, endOfDayUTC } = getISTDayBoundaries();
+    const { startOfDayUTC, endOfDayUTC, targetDate } = getISTDayBoundaries();
 
     const attendances = await prisma.attendance.findMany({
       where: {
-        date: { gte: startOfDayUTC, lt: endOfDayUTC },
+        date: targetDate,
         checkOutTime: null,
       }
     });
