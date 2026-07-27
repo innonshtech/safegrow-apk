@@ -99,6 +99,7 @@ model Attendance {
   checkOutLat      Float?
   checkOutLng      Float?
   checkOutPhotoUrl String?
+  autoCheckedOut   Boolean @default(false)
 
   visits        Visit[]
   locationPings LocationPing[]

@@ -26,14 +26,14 @@ export async function GET(request: Request) {
     });
 
     let createdCount = 0;
-    const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+    const THIRTY_MINS_MS = 30 * 60 * 1000;
 
     for (const att of attendances) {
       if (att.locationPings.length > 0) {
         const lastPingTime = new Date(att.locationPings[0].time).getTime();
         const now = Date.now();
 
-        if (now - lastPingTime > TWO_HOURS_MS) {
+        if (now - lastPingTime > THIRTY_MINS_MS) {
           const existingAlert = await prisma.fraudAlert.findFirst({
             where: {
               userId: att.userId,

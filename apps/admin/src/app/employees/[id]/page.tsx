@@ -193,18 +193,12 @@ export default async function EmployeeDetailPage({
 
         {/* Tabs */}
         <div className={styles.tabsContainer}>
-          {isManager ? (
-            <>
-              <Link href={`/employees/${employee.id}?tab=team`} className={`${styles.tab} ${activeTab === 'team' ? styles.activeTab : ''}`}>Team</Link>
-              <Link href={`/employees/${employee.id}?tab=activity`} className={`${styles.tab} ${activeTab === 'activity' ? styles.activeTab : ''}`}>Activity</Link>
-            </>
-          ) : (
-            <>
-              <Link href={`/employees/${employee.id}?tab=day`} className={`${styles.tab} ${activeTab === 'day' ? styles.activeTab : ''}`}>Day</Link>
-              <Link href={`/employees/${employee.id}?tab=attendance`} className={`${styles.tab} ${activeTab === 'attendance' ? styles.activeTab : ''}`}>Attendance</Link>
-              <Link href={`/employees/${employee.id}?tab=visits`} className={`${styles.tab} ${activeTab === 'visits' ? styles.activeTab : ''}`}>Visits</Link>
-            </>
+          {isManager && (
+            <Link href={`/employees/${employee.id}?tab=team`} className={`${styles.tab} ${activeTab === 'team' ? styles.activeTab : ''}`}>Team</Link>
           )}
+          <Link href={`/employees/${employee.id}?tab=day`} className={`${styles.tab} ${activeTab === 'day' ? styles.activeTab : ''}`}>Day</Link>
+          <Link href={`/employees/${employee.id}?tab=attendance`} className={`${styles.tab} ${activeTab === 'attendance' ? styles.activeTab : ''}`}>Attendance</Link>
+          <Link href={`/employees/${employee.id}?tab=visits`} className={`${styles.tab} ${activeTab === 'visits' ? styles.activeTab : ''}`}>Visits</Link>
         </div>
 
         {/* Tab Content Area */}
@@ -242,8 +236,8 @@ export default async function EmployeeDetailPage({
             </div>
           )}
 
-          {/* REP: DAY TAB */}
-          {!isManager && activeTab === 'day' && (
+          {/* DAY TAB */}
+          {activeTab === 'day' && (
             <div className={styles.dayTab}>
               <div className={styles.dayTopBar}>
                 <div className={styles.dayStats}>
@@ -294,8 +288,8 @@ export default async function EmployeeDetailPage({
             </div>
           )}
 
-          {/* REP: ATTENDANCE TAB */}
-          {!isManager && activeTab === 'attendance' && (
+          {/* ATTENDANCE TAB */}
+          {activeTab === 'attendance' && (
             <div className={styles.attendanceTab}>
               <div className={styles.attSidebar}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -390,8 +384,8 @@ export default async function EmployeeDetailPage({
             </div>
           )}
 
-          {/* REP: VISITS TAB */}
-          {!isManager && activeTab === 'visits' && (
+          {/* VISITS TAB */}
+          {activeTab === 'visits' && (
             <div className={styles.visitsTabFull}>
               <div className={styles.vListSidebar}>
                 <div className={styles.dateSelector} style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>

@@ -28,6 +28,7 @@ function getLateCheckInText(alert: any) {
 export default function AlertsClient({ initialAlerts }: { initialAlerts: any[] }) {
   const [alerts, setAlerts] = useState(initialAlerts);
   const [filter, setFilter] = useState('unresolved');
+  const [roleFilter, setRoleFilter] = useState('ALL');
 
   useEffect(() => {
     // Poll for new alerts every 30 seconds
@@ -46,7 +47,9 @@ export default function AlertsClient({ initialAlerts }: { initialAlerts: any[] }
     return () => clearInterval(intervalId);
   }, []);
 
-  const displayAlerts = filter === 'unresolved' ? alerts.filter(a => !a.resolvedAt) : alerts;
+  const displayAlerts = alerts
+    .filter(a => filter === 'unresolved' ? !a.resolvedAt : true)
+    .filter(a => roleFilter === 'ALL' ? true : a.user?.role === roleFilter);
 
   return (
     <>
@@ -65,6 +68,17 @@ export default function AlertsClient({ initialAlerts }: { initialAlerts: any[] }
           >
             All
           </button>
+        </div>
+        <div className={styles.filters} style={{ marginLeft: 'auto' }}>
+          <select 
+            value={roleFilter} 
+            onChange={(e) => setRoleFilter(e.target.value)}
+            style={{ padding: '0.4rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid #d1d5db', fontSize: '0.875rem' }}
+          >
+            <option value="ALL">All Roles</option>
+            <option value="MANAGER">Managers</option>
+            <option value="REP">Reps</option>
+          </select>
         </div>
       </div>
 
@@ -112,12 +126,12 @@ export default function AlertsClient({ initialAlerts }: { initialAlerts: any[] }
                   {alert.type === 'FAKE_LOCATION' && ' · capture blocked'}
                   {alert.type === 'TRACKING_OFF' && ' · while checked in'}
                   {alert.type === 'NO_CHECK_OUT' && ' · day left incomplete'}
-                  {alert.type === 'ZERO_VISITS' && ' · by 2:00 PM'}
+                  {alert.type === 'ZERO_VISITS' && ' · no client visits recorded by 2:00 PM'}
                   {alert.type === 'LATE_CHECK_IN' && getLateCheckInText(alert)}
                 </span>
               </div>
               <div className={styles.alertMeta}>
-                {alert.user.name} · {alert.user.territory || 'Unassigned'} · {formatDate(alert.createdAt)}
+                {alert.user.name} ({alert.user.role === 'MANAGER' ? 'Manager' : 'Rep'}) · {alert.user.territory || 'Unassigned'} · {formatDate(alert.createdAt)}
                 {alert.type !== 'LATE_CHECK_IN' && ` · ${formatTime(alert.createdAt)}`}
               </div>
             </div>
