@@ -45,7 +45,18 @@ export async function GET(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, createdCount });
+    // Silently check them out for the next day to start fresh
+    await prisma.attendance.updateMany({
+      where: {
+        date: targetDate,
+        checkOutTime: null,
+      },
+      data: {
+        autoCheckedOut: true,
+      }
+    });
+
+    return NextResponse.json({ success: true, alertsCreated: createdCount, autoCheckedOut: attendances.length });
   } catch (error) {
     console.error('Cron no-checkout error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
