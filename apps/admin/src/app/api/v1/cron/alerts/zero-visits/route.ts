@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@safegrow/db';
+import { getISTDayBoundaries } from '../timezone-helper';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -8,15 +9,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setDate(endOfDay.getDate() + 1);
+    const { startOfDayUTC, endOfDayUTC } = getISTDayBoundaries();
 
     // Get all attendances today with visits count
     const attendances = await prisma.attendance.findMany({
       where: {
-        date: { gte: startOfDay, lt: endOfDay },
+        date: { gte: startOfDayUTC, lt: endOfDayUTC },
       },
       include: {
         _count: {
@@ -34,7 +32,7 @@ export async function GET(request: Request) {
           where: {
             userId: att.userId,
             type: 'ZERO_VISITS',
-            createdAt: { gte: startOfDay, lt: endOfDay },
+            createdAt: { gte: startOfDayUTC, lt: endOfDayUTC },
           }
         });
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@safegrow/db';
+import { getISTDayBoundaries } from '../timezone-helper';
 
 export async function GET(request: Request) {
   // Simple cron secret check
@@ -16,18 +17,15 @@ export async function GET(request: Request) {
     const standardTimeStr = setting?.value || '08:00';
     const [stdHour, stdMinute] = standardTimeStr.split(':').map(Number);
 
-    // 2. Get today's start and end date
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setDate(endOfDay.getDate() + 1);
+    // 2. Get today's start and end date in IST
+    const { startOfDayUTC, endOfDayUTC, year, month, day } = getISTDayBoundaries();
 
     // 3. Fetch all attendances for today
     const attendances = await prisma.attendance.findMany({
       where: {
         date: {
-          gte: startOfDay,
-          lt: endOfDay,
+          gte: startOfDayUTC,
+          lt: endOfDayUTC,
         }
       },
       include: {
@@ -42,10 +40,10 @@ export async function GET(request: Request) {
     for (const att of attendances) {
       const checkIn = new Date(att.checkInTime);
       
-      // Calculate standard check-in time for this specific day
-      const expectedCheckIn = new Date(checkIn.getFullYear(), checkIn.getMonth(), checkIn.getDate(), stdHour, stdMinute);
+      // Calculate standard check-in time for this specific day in IST -> converted to UTC
+      const expectedCheckInUTC = new Date(Date.UTC(year, month, day, stdHour, stdMinute, 0) - (5.5 * 60 * 60 * 1000));
       
-      const isLate = checkIn > expectedCheckIn;
+      const isLate = checkIn > expectedCheckInUTC;
 
       // Find existing alert for this user today
       const existingAlert = await prisma.fraudAlert.findFirst({
@@ -53,8 +51,8 @@ export async function GET(request: Request) {
           userId: att.userId,
           type: 'LATE_CHECK_IN',
           createdAt: {
-            gte: startOfDay,
-            lt: endOfDay,
+            gte: startOfDayUTC,
+            lt: endOfDayUTC,
           }
         }
       });
@@ -66,7 +64,7 @@ export async function GET(request: Request) {
             data: {
               userId: att.userId,
               type: 'LATE_CHECK_IN',
-              metadata: { expected: expectedCheckIn.toISOString(), actual: checkIn.toISOString() }
+              metadata: { expected: expectedCheckInUTC.toISOString(), actual: checkIn.toISOString() }
             }
           });
           createdCount++;
