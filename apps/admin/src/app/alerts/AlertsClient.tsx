@@ -18,6 +18,13 @@ function formatDate(date: Date | string) {
   return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric' }).format(d);
 }
 
+function getLateCheckInText(alert: any) {
+  if (alert.metadata?.expected && alert.metadata?.actual) {
+    return ` · Expected by ${formatTime(alert.metadata.expected)}, arrived at ${formatTime(alert.metadata.actual)}`;
+  }
+  return ` · at ${formatTime(alert.createdAt)}`;
+}
+
 export default function AlertsClient({ initialAlerts }: { initialAlerts: any[] }) {
   const [alerts, setAlerts] = useState(initialAlerts);
   const [filter, setFilter] = useState('unresolved');
@@ -106,7 +113,7 @@ export default function AlertsClient({ initialAlerts }: { initialAlerts: any[] }
                   {alert.type === 'TRACKING_OFF' && ' · while checked in'}
                   {alert.type === 'NO_CHECK_OUT' && ' · day left incomplete'}
                   {alert.type === 'ZERO_VISITS' && ' · by 2:00 PM'}
-                  {alert.type === 'LATE_CHECK_IN' && ` · ${formatTime(alert.createdAt)}`}
+                  {alert.type === 'LATE_CHECK_IN' && getLateCheckInText(alert)}
                 </span>
               </div>
               <div className={styles.alertMeta}>

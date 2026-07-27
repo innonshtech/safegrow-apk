@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@safegrow/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const alerts = await prisma.fraudAlert.findMany({
