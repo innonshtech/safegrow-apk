@@ -63,7 +63,11 @@ export const CheckInConfirmScreen = () => {
         attendanceId: response.data.attendanceId 
       }));
       
-      await LocationTrackingService.configureAndStart(response.data.attendanceId);
+      try {
+        await LocationTrackingService.configureAndStart(response.data.attendanceId);
+      } catch (trackErr) {
+        console.error('Failed to start location tracking:', trackErr);
+      }
       
       globalToast.show({ message: 'Successfully checked in!', type: 'success' });
       setLoading(false);

@@ -2,12 +2,13 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { checkOut } from '../../attendance/store/attendanceSlice';
+import { checkOut, syncAttendanceStatus } from '../../attendance/store/attendanceSlice';
 import { Button } from '../../../components/ui/Button';
 import { theme } from '../../../config/theme';
 import { logout } from '../../auth/store/authSlice';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { apiClient } from '../../../api/client';
+import { storage } from '../../../store/mmkv';
 import Geolocation from 'react-native-geolocation-service';
 
 export const HomeScreen = () => {
@@ -21,11 +22,42 @@ export const HomeScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      const fetchVisits = async () => {
+      const syncData = async () => {
         try {
           setLoadingVisits(true);
+          
+          // 1. Sync attendance status with backend
+          try {
+            const statusRes = await apiClient.get('/attendance/status');
+            const { isCheckedIn: serverCheckedIn, attendance, todayVisitsCount } = statusRes.data;
+            if (serverCheckedIn && attendance) {
+              const formattedTime = new Date(attendance.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              dispatch(syncAttendanceStatus({
+                isCheckedIn: true,
+                attendanceId: attendance.id,
+                time: formattedTime,
+                timestamp: attendance.checkInTime,
+                todayVisitsCount,
+              }));
+            } else {
+              dispatch(syncAttendanceStatus({
+                isCheckedIn: false,
+                todayVisitsCount: todayVisitsCount || 0,
+              }));
+            }
+          } catch (err) {
+            // Log quietly without triggering RN RedBox overlay
+            console.warn('Attendance status sync unavailable:', err);
+            // Fallback: If local timestamp is from a past day, reset local check-in state
+            const storedTimestamp = storage.getString('checkInTimestamp');
+            if (storedTimestamp && new Date(storedTimestamp).toDateString() !== new Date().toDateString()) {
+              dispatch(syncAttendanceStatus({ isCheckedIn: false, todayVisitsCount: 0 }));
+            }
+          }
+
+          // 2. Fetch visits history
           const response = await apiClient.get('/visits/history');
-          setVisits(response.data);
+          setVisits(response.data || []);
         } catch (error) {
           console.error('Failed to fetch visits:', error);
         } finally {
@@ -33,8 +65,8 @@ export const HomeScreen = () => {
         }
       };
 
-      fetchVisits();
-    }, [])
+      syncData();
+    }, [dispatch])
   );
   
   const { isCheckedIn, checkInTime, checkInTimestamp, visitsCount, distanceKm, hoursTracked } = useSelector(
@@ -73,6 +105,18 @@ export const HomeScreen = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const firstName = user?.name?.split(' ')[0] || 'User';
   
+  // Filter visits to strictly include TODAY's visits only
+  const todayVisits = visits.filter((visit) => {
+    if (!visit.time) return false;
+    return new Date(visit.time).toDateString() === new Date().toDateString();
+  });
+
+  const formattedTodayDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
+
   // Calculate initials from user name
   const getInitials = (name: string) => {
     if (!name) return 'U';
@@ -99,7 +143,7 @@ export const HomeScreen = () => {
         <View>
           <Text style={styles.greeting}>Hi, {firstName}</Text>
           <Text style={styles.dateText}>
-            {isCheckedIn ? `Checked in · ${checkInTime}` : 'Wed, 12 March'}
+            {isCheckedIn ? `Checked in · ${checkInTime}` : formattedTodayDate}
           </Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
@@ -138,7 +182,7 @@ export const HomeScreen = () => {
           <View style={styles.metricsRow}>
             <View style={styles.metricBox}>
               <Text style={styles.metricLabel}>Visits</Text>
-              <Text style={styles.metricValue}>{visitsCount}</Text>
+              <Text style={styles.metricValue}>{todayVisits.length}</Text>
             </View>
             <View style={styles.metricBox}>
               <Text style={styles.metricLabel}>Distance</Text>
@@ -152,7 +196,7 @@ export const HomeScreen = () => {
 
           {/* Visits List */}
           <View style={styles.visitsContainer}>
-            {visits.map((visit) => (
+            {todayVisits.map((visit) => (
               <View key={visit.id} style={styles.visitCard}>
                 {visit.photoUrl ? (
                   <Image source={{ uri: visit.photoUrl }} style={styles.visitIconImage} />
@@ -166,7 +210,7 @@ export const HomeScreen = () => {
                 <Text style={styles.visitStatus}>{visit.outcome.replace('_', '\n')}</Text>
               </View>
             ))}
-            {visits.length === 0 && !loadingVisits && (
+            {todayVisits.length === 0 && !loadingVisits && (
               <Text style={{ textAlign: 'center', marginTop: 20, color: theme.colors.inkLight }}>No visits recorded yet.</Text>
             )}
           </View>

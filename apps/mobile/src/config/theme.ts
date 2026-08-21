@@ -5,6 +5,7 @@ export const theme = {
     primaryLight: '#E9F5EA',
     danger: '#B3261E',
     dangerLight: '#FCECEA',
+    success: '#2E7D32',
     warning: '#8A5A00',
     warningLight: '#FBF1DC',
     ink: '#1A241E',
