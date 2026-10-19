@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Pressable, Linking, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, setCredentials } from '../../auth/store/authSlice';
@@ -123,6 +123,11 @@ export const ProfileScreen = () => {
             rightText={isBatteryRestricted ? "Action needed" : undefined} 
             onPress={() => navigation.navigate('LocationTracking')}
           />
+          <View style={styles.divider} />
+          <ListItem 
+            title="Privacy policy" 
+            onPress={() => Linking.openURL('https://safegrow-apk-admin.vercel.app/privacy-policy')} 
+          />
         </View>
 
         {/* Account */}
@@ -131,6 +136,20 @@ export const ProfileScreen = () => {
           <ListItem 
             title="Change password" 
             onPress={() => navigation.navigate('ChangePassword')}
+          />
+          <View style={styles.divider} />
+          <ListItem 
+            title="Request account deletion" 
+            onPress={() => {
+              Alert.alert(
+                "Request Account Deletion",
+                "To request permanent deletion of your account and associated personal data, please contact your organization administrator or email info@safegrow.in with your Employee ID.",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  { text: "Email Support", onPress: () => Linking.openURL('mailto:info@safegrow.in?subject=Account%20Deletion%20Request') }
+                ]
+              );
+            }} 
           />
           <View style={styles.divider} />
           <ListItem 

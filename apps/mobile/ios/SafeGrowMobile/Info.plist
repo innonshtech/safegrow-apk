@@ -34,7 +34,11 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string>SafeGrow requires your location to verify your check-in, check-out, and field visit locations.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>SafeGrow tracks your location during active shifts to map your route and verify travel allowance.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>SafeGrow uses the camera to capture attendance verification selfies and documentation photos during field visits.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
