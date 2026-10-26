@@ -166,7 +166,7 @@ If you have questions, concerns, complaints, or wish to exercise your data priva
 - **Email:** info@safegrow.in
 - **Phone / Hotline:** +91 98347 92644
 - **Official Website:** https://www.safegrow.in/
-- **Policy Hosted At:** https://safegrow-apk-admin.vercel.app/privacy-policy
+- **Policy Hosted At:** https://safegrow.innonsh.com/privacy-policy
 - **Organization:** SafeGrow (Innonsh Technologies)
 - **Mailing Address:**  
   SafeGrow / Innonsh Technologies Legal & Compliance Department  
