@@ -224,7 +224,7 @@ export default function PrivacyPolicyPage() {
             <strong>Email:</strong> <a href="mailto:info@safegrow.in" style={{ color: '#2E7D32', textDecoration: 'underline' }}>info@safegrow.in</a><br />
             <strong>Phone:</strong> <a href="tel:+919834792644" style={{ color: '#2E7D32' }}>+91 98347 92644</a><br />
             <strong>Official Website:</strong> <a href="https://www.safegrow.in/" target="_blank" rel="noopener noreferrer" style={{ color: '#2E7D32' }}>https://www.safegrow.in/</a><br />
-            <strong>Policy Hosted At:</strong> <a href="https://safegrow.innonsh.com/privacy-policy" style={{ color: '#2E7D32' }}>https://safegrow.innonsh.com/privacy-policy</a><br />
+            <strong>Policy Hosted At:</strong> <a href="https://safegrow.innonsh.com/privacy" style={{ color: '#2E7D32' }}>https://safegrow.innonsh.com/privacy</a><br />
             <strong>Company:</strong> SafeGrow (Innonsh Technologies)
           </p>
         </footer>
