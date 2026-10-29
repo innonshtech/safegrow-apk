@@ -15,8 +15,8 @@ export const LocationTrackingScreen = () => {
   const checkPermissions = async () => {
     // Check Battery Optimization
     try {
-      const isRestricted = await DeviceInfo.isBatteryOptimizationEnabled();
-      setIsBatteryRestricted(isRestricted);
+      const powerState = await DeviceInfo.getPowerState();
+      setIsBatteryRestricted(!!powerState.lowPowerMode);
     } catch (e) {
       console.log('Error checking battery optimization', e);
     }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Camera, useCameraDevice, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
+import { Camera, CameraRef, useCameraDevice, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
 import Geolocation from 'react-native-geolocation-service';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { theme } from '../../../config/theme';
@@ -12,7 +12,7 @@ export const VisitCameraScreen = () => {
   const device = useCameraDevice(useFrontCamera ? 'front' : 'back');
 
   const { hasPermission: hasCameraPermission, requestPermission: requestCameraPermission } = useCameraPermission();
-  const camera = useRef<Camera>(null);
+  const camera = useRef<CameraRef>(null);
   const photoOutput = usePhotoOutput();
   const [hasPermission, setHasPermission] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);

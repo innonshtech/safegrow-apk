@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
   },
   mapMarkerStart: {
     backgroundColor: theme.colors.primaryDark,

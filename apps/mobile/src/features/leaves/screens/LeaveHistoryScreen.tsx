@@ -77,7 +77,7 @@ export const LeaveHistoryScreen = () => {
                 </TouchableOpacity>
               </>
             )}
-            <View style={[styles.statusBadge, styles[`status_${item.status}` as keyof typeof styles]]}>
+            <View style={[styles.statusBadge, styles[`status_${item.status}` as keyof typeof styles] as any]}>
               <Text style={[styles.statusText, styles[`statusText_${item.status}` as keyof typeof styles]]}>{item.status}</Text>
             </View>
           </View>

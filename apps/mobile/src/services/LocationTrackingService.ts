@@ -13,21 +13,21 @@ class LocationTrackingService {
       const distanceFilter = intervalMs < 60000 ? 10 : 50;
 
       await BackgroundGeolocation.ready({
-        desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
+        desiredAccuracy: BackgroundGeolocation.DesiredAccuracy.High,
         distanceFilter: distanceFilter, // meters
         locationUpdateInterval: intervalMs, // only for Android
         fastestLocationUpdateInterval: intervalMs, // only for Android
         stopOnTerminate: false,
         startOnBoot: true,
         debug: false,
-        logLevel: BackgroundGeolocation.LOG_LEVEL_OFF,
+        logLevel: BackgroundGeolocation.LogLevel.Off,
         backgroundPermissionRationale: {
           title: "Allow access to this device's location in the background?",
           message: "In order to track your route during your shift, we need background location access.",
           positiveAction: "Change to Allow all the time",
           negativeAction: "Cancel"
         }
-      });
+      } as any);
       
       BackgroundGeolocation.onLocation(async (location) => {
         try {
@@ -60,7 +60,7 @@ class LocationTrackingService {
 
   async stop() {
     await BackgroundGeolocation.stop();
-    BackgroundGeolocation.removeAllListeners();
+    await BackgroundGeolocation.removeListeners();
     this.isConfigured = false;
   }
 }

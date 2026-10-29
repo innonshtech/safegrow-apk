@@ -7,11 +7,19 @@ interface ButtonProps {
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'outline';
   loading?: boolean;
+  disabled?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({ title, onPress, variant = 'primary', loading = false }) => {
+export const Button: React.FC<ButtonProps> = ({
+  title,
+  onPress,
+  variant = 'primary',
+  loading = false,
+  disabled = false,
+}) => {
   const isPrimary = variant === 'primary';
   const isOutline = variant === 'outline';
+  const isDisabled = loading || disabled;
 
   return (
     <TouchableOpacity
@@ -19,9 +27,10 @@ export const Button: React.FC<ButtonProps> = ({ title, onPress, variant = 'prima
         styles.container,
         isPrimary && styles.primaryBg,
         isOutline && styles.outlineBg,
+        isDisabled && styles.disabled,
       ]}
       onPress={onPress}
-      disabled={loading}
+      disabled={isDisabled}
     >
       {loading ? (
         <ActivityIndicator color={isPrimary ? theme.colors.surface : theme.colors.primary} />
@@ -49,6 +58,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: theme.colors.line,
+  },
+  disabled: {
+    opacity: 0.6,
   },
   text: {
     fontFamily: theme.fonts.medium,

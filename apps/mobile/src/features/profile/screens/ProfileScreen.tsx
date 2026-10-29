@@ -32,8 +32,8 @@ export const ProfileScreen = () => {
 
     const checkBattery = async () => {
       try {
-        const isRestricted = await DeviceInfo.isBatteryOptimizationEnabled();
-        setIsBatteryRestricted(isRestricted);
+        const powerState = await DeviceInfo.getPowerState();
+        setIsBatteryRestricted(!!powerState.lowPowerMode);
       } catch (e) {}
     };
     checkBattery();

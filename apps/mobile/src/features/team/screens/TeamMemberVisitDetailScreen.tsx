@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   media: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
   },
   overlayBox: {
     position: 'absolute',

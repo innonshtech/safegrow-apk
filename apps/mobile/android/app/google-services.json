@@ -9,6 +9,25 @@
       "client_info": {
         "mobilesdk_app_id": "1:534218873947:android:e5ba7c6690cafeaf58b37e",
         "android_client_info": {
+          "package_name": "com.safegrow.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDm1BZhqJ-jFSX_noG8h2pgHlR5ff0U9bI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534218873947:android:e5ba7c6690cafeaf58b37e",
+        "android_client_info": {
           "package_name": "com.safegrowmobile"
         }
       },

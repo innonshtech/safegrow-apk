@@ -103,7 +103,7 @@ export const VerifyCodeScreen = () => {
           {otp.map((digit, index) => (
             <TextInput
               key={index}
-              ref={ref => inputs.current[index] = ref}
+              ref={ref => { inputs.current[index] = ref; }}
               style={[styles.otpInput, digit ? styles.otpInputFilled : null]}
               keyboardType="number-pad"
               maxLength={1}

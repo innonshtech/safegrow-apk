@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
-import { Camera, useCameraDevice, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
+import { Camera, CameraRef, useCameraDevice, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
 import Geolocation from 'react-native-geolocation-service';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { Button } from '../../../components/ui/Button';
@@ -12,7 +12,7 @@ import { RootState } from '../../../store';
 export const CheckOutScreen = () => {
   const navigation = useNavigation<any>();
   const device = useCameraDevice('front');
-  const camera = useRef<Camera>(null);
+  const camera = useRef<CameraRef>(null);
   const photoOutput = usePhotoOutput();
 
   const [hasPermission, setHasPermission] = useState(false);

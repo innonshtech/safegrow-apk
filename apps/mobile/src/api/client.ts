@@ -36,7 +36,7 @@ apiClient.interceptors.response.use(
       // The request was made and the server responded with a status code
       if (error.response.status === 401) {
         // Clear token and force logout on 401
-        storage.delete('token');
+        storage.remove('token');
         store.dispatch(logout());
         globalToast.show({ message: 'Session expired. Please log in again.', type: 'error' });
       } else if (error.response.status >= 500) {
