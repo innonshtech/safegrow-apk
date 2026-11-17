@@ -1,22 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@safegrow/db';
+import { getISTDayBoundaries } from '../timezone-helper';
+import { verifyCronAuth, unauthorizedCronResponse } from '../../cron-auth';
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!verifyCronAuth(request)) {
+    return unauthorizedCronResponse();
   }
 
   try {
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setDate(endOfDay.getDate() + 1);
+    const { startOfDayUTC, endOfDayUTC, targetDate } = getISTDayBoundaries();
 
     // Get all attendances today with visits count
     const attendances = await prisma.attendance.findMany({
       where: {
-        date: { gte: startOfDay, lt: endOfDay },
+        date: targetDate,
       },
       include: {
         _count: {
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
           where: {
             userId: att.userId,
             type: 'ZERO_VISITS',
-            createdAt: { gte: startOfDay, lt: endOfDay },
+            createdAt: { gte: startOfDayUTC, lt: endOfDayUTC },
           }
         });
 
@@ -54,6 +54,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, createdCount });
   } catch (error) {
     console.error('Cron zero-visits error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

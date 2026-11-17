@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "pnpm --filter @safegrow/db generate && next build",
+    "postinstall": "pnpm --filter @safegrow/db generate",
     "start": "next start",
     "lint": "eslint"
   },

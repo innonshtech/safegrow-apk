@@ -1,22 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@safegrow/db';
+import { getISTDayBoundaries } from '../timezone-helper';
+import { verifyCronAuth, unauthorizedCronResponse } from '../../cron-auth';
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!verifyCronAuth(request)) {
+    return unauthorizedCronResponse();
   }
 
   try {
-    const today = new Date();
-    // Look at yesterday's attendances since this runs at end of day or midnight
-    const startOfYesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-    const endOfYesterday = new Date(startOfYesterday);
-    endOfYesterday.setDate(endOfYesterday.getDate() + 1);
+    // 1. Get today's start and end date in IST (since this runs at 11:55 PM IST)
+    const { startOfDayUTC, endOfDayUTC, targetDate } = getISTDayBoundaries();
 
     const attendances = await prisma.attendance.findMany({
       where: {
-        date: { gte: startOfYesterday, lt: endOfYesterday },
+        date: targetDate,
         checkOutTime: null,
       }
     });
@@ -28,7 +28,10 @@ export async function GET(request: Request) {
         where: {
           userId: att.userId,
           type: 'NO_CHECK_OUT',
-          createdAt: { gte: startOfYesterday, lt: endOfYesterday },
+          createdAt: {
+            gte: startOfDayUTC,
+            lt: endOfDayUTC,
+          }
         }
       });
 
@@ -44,9 +47,21 @@ export async function GET(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, createdCount });
+    // Silently check them out for the next day to start fresh
+    await prisma.attendance.updateMany({
+      where: {
+        date: targetDate,
+        checkOutTime: null,
+      },
+      data: {
+        autoCheckedOut: true,
+      }
+    });
+
+    return NextResponse.json({ success: true, alertsCreated: createdCount, autoCheckedOut: attendances.length });
   } catch (error) {
     console.error('Cron no-checkout error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
